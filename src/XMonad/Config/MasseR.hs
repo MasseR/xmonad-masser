@@ -165,7 +165,7 @@ myManageHook = composeAll $ concat [
 myKeys :: ExtraConfig -> XConfig l -> [((KeyMask, KeySym), NamedAction)]
 myKeys extraConfig conf =
     let subKeys str ks = subtitle str : mkNamedKeymap conf ks in
-    subKeys "Actions" [ ("M-S-r", addName "foo" (spawn "xmonad --recompile" >> spawn "xmonad --restart"))
+    subKeys "Actions" [ ("M-S-r", addName "foobar" (spawn "xmonad --recompile" >> spawn "xmonad --restart"))
                       , ("M-C-l", addName "Lock screen" $ spawn locker)] ^++^
     subKeys "System" [ ("<XF86Sleep>", addName "Suspend machine" $ spawn "sudo pm-suspend")
                      , ("<XF86AudioRaiseVolume>", addName "Increase volume" $ spawn "amixer set Master 2%+")
