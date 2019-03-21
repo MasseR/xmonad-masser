@@ -184,7 +184,7 @@ myKeys extraConfig conf =
                         , ("M-n", scratchSubmaps conf)
                         , ("M-s", searchSubmaps conf)
                         , ("M-p", addName "Retrieve password" $ passPrompt def)
-                        , ("M-S-e", addName "Open with app" xdg_open)
+                        , ("M-S-e", addName "Open with app" xdgOpen)
                         , ("M-e", addName "Run app" $ runOrRaisePrompt def)] ^++^
     subKeys "Windows" [ ("M-j", addName "Go down" $ windowGo D False)
                       , ("M-k", addName "Go up" $ windowGo U False)

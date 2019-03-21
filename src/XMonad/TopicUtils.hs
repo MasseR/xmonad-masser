@@ -1,7 +1,8 @@
+{-# LANGUAGE TupleSections #-}
 module XMonad.TopicUtils where
 
 import Data.Maybe (fromMaybe, listToMaybe, mapMaybe)
-import Data.List (isPrefixOf, sort, nub)
+import Data.List (isPrefixOf, nub, sortOn)
 import XMonad.Actions.TopicSpace
 import XMonad
 import qualified Data.Map as M
@@ -11,6 +12,7 @@ import qualified XMonad.StackSet as W
 import XMonad.Util.Dmenu (dmenu)
 import XMonad.Actions.DynamicWorkspaces
 import XMonad.Util.NamedWindows (getName)
+import Data.Ord
 
 
 realTopicDir :: M.Map String FilePath -> X String
@@ -58,7 +60,7 @@ gridselectCurrentWindows :: GSConfig Window -> X (Maybe Window)
 gridselectCurrentWindows gsconf = windowMap >>= gridselect gsconf
     where
         getName' = fmap show . getName
-        kvPair w = flip (,) w `fmap` getName' w
+        kvPair w = (, w) <$> getName' w
         windowMap = do
             ws <- gets (nub . W.integrate' . W.stack . W.workspace . W.current . windowset)
             mapM kvPair ws
@@ -78,11 +80,11 @@ currentTopicAction' tg = do
 copyTopic :: X ()
 copyTopic = do
   currentTopic <- realTopic
-  lastN <- gets (listToMaybe . reverse . sort . mapMaybe (subset currentTopic . W.tag) . W.workspaces . windowset)
-  addWorkspace (currentTopic ++ ":" ++ (show $ maybe 2 (+1) lastN))
+  lastN <- gets (listToMaybe . sortOn Down . mapMaybe (subset currentTopic . W.tag) . W.workspaces . windowset)
+  addWorkspace (currentTopic ++ ":" ++ show (maybe 2 (+1) lastN))
   where
     subset :: String -> String -> Maybe Int
-    subset topic other = if topic `isPrefixOf` other then (readM $ tail' $ snd $ break (== ':') other) else Nothing
+    subset topic other = if topic `isPrefixOf` other then readM $ tail' $ dropWhile (/= ':') other else Nothing
     readM a = case reads a of
                [(x,_)] -> Just x
                _ -> Nothing

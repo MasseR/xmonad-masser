@@ -10,7 +10,7 @@ import           XMonad.Core
 import           XMonad.Prompt
 import           XMonad.Util.Run       (runProcessWithInput)
 
-data Pass = Pass { passLabel :: String }
+newtype Pass = Pass { passLabel :: String }
 
 -- Rosetta code levenshtein
 levenshtein :: String -> String -> Int
@@ -37,7 +37,7 @@ mkPassPrompt label f conf = do
   -- I'm just sorting here, but could use some kind of fuzzy matching instead, but it requires a bit more effort
   passwords <- sort <$> liftIO getPasswords
   -- Other change, use infixof instead of prefixof
-  mkXPrompt (Pass label) conf (\input -> pure (sortBy (compare `on` (levenshtein input)) . filter (consumes input) $ passwords)) f
+  mkXPrompt (Pass label) conf (\input -> pure (sortBy (compare `on` levenshtein input) . filter (consumes input) $ passwords)) f
   where
     consumes [] _ = True -- everything consumed
     consumes (_:_) [] = False -- all not consumed
