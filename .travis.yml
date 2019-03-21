@@ -1,0 +1,12 @@
+language: nix
+
+os:
+  - linux
+
+before_script:
+  - mkdir -m 0755 -p /nix/var/nix/{profiles,gcroots}/per-user/$USER
+  - mkdir -p ~/.config/nixpkgs
+
+script:
+  # - nix run nixpkgs.haskellPackages.hlint -c hlint src
+  - nix build ./release.nix -A xmonad-masser
