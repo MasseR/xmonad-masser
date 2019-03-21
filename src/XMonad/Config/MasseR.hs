@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
 module XMonad.Config.MasseR  where
 
 
@@ -70,15 +71,17 @@ scratchSubmaps conf = submapName . mkNamedKeymap conf $ [
     ]
 
 -- Search engines inside submaps
-searchSubmaps :: XConfig l -> NamedAction
-searchSubmaps conf =
+searchSubmaps :: ExtraConfig -> XConfig l -> NamedAction
+searchSubmaps extraConfig conf =
     let mkBrowser = promptSearchBrowser def "qutebrowser"
         _googleP = addName "Search google" $ mkBrowser google
         ddgP = addName "Search duckduckgo" $ mkBrowser (searchEngine "duckduckgo" "http://duckduckgo.com/?q=")
+        extras = [(key, addName name $ mkBrowser (searchEngine name url)) | Search{..} <- searchEndpoints extraConfig]
     in submapName . mkNamedKeymap conf $
             [ ("d", ddgP) -- Training to use ddg again
             , ("g", ddgP) -- training to use ddg again
-            ]
+            ] ++ extras
+
 
 myNav2d :: Navigation2DConfig
 myNav2d = def { defaultTiledNavigation = lineNavigation }
@@ -181,7 +184,7 @@ myKeys extraConfig conf =
     subKeys "Launchers" [ ("M-S-y", addName "Open youtube" $ spawn "mpv $(clip -o)")
                         , ("M-S-<Return>", addName "Open terminal" $ spawn $ XMonad.terminal conf)
                         , ("M-n", scratchSubmaps conf)
-                        , ("M-s", searchSubmaps conf)
+                        , ("M-s", searchSubmaps extraConfig conf)
                         , ("M-p", addName "Retrieve password" $ passPrompt def)
                         , ("M-S-e", addName "Open with app" xdgOpen)
                         , ("M-e", addName "Run app" $ runOrRaisePrompt def)] ^++^

@@ -19,7 +19,14 @@ data TopicRule =
             }
                deriving (Show, Generic)
 
+data Search = Search { name :: String
+                     , key :: String
+                     , url :: String
+                     }
+            deriving (Show, Generic)
+
 data ExtraConfig =
   ExtraConfig { applications :: Applications
-              , topics :: [ TopicRule ] }
+              , topics :: [ TopicRule ]
+              , searchEndpoints :: [Search] }
                  deriving (Show, Generic)
