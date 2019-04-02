@@ -18,7 +18,6 @@ import           XMonad.Layout.BinarySpacePartition (emptyBSP)
 import           XMonad.Layout.Decoration           (Decoration,
                                                      DefaultShrinker)
 import           XMonad.Layout.DwmStyle
-import           XMonad.Layout.HintedGrid
 import           XMonad.Layout.LayoutModifier       (ModifiedLayout)
 import           XMonad.Layout.Master
 import           XMonad.Layout.NoBorders            (smartBorders)
@@ -239,13 +238,11 @@ masser extraConfig = xmonad =<< statusBar (bar extraConfig) zenburnPP toggleStru
                onWorkspace "dynamics" webLayout $
                onWorkspace "pdf" pdfLayout $
                onWorkspace "documents" documentLayout $
-               onWorkspace "mail" mailLayout $
-               onWorkspace "irc" ircLayout
+               onWorkspace "mail" mailLayout
                defLayout
       where
         -- Default layout
         defLayout = tiled ||| tabLayout ||| readLayout ||| bspLayout ||| vimLayout ||| spiral (6/7) ||| Full
-        ircLayout = GridRatio (4/3) False ||| emptyBSP
         -- Pdfs are restricted to tabs
         vimLayout = Mirror (mastered (1/100) (4/5) Accordion)
         pdfLayout =  readLayout ||| tiled ||| tabLayout
