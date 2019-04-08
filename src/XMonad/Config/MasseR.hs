@@ -1,15 +1,17 @@
+{-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE TypeApplications  #-}
 module XMonad.Config.MasseR  where
 
 
-import           XMonad.Password
-import           XMonad.CustomPrompt
-import           XMonad.TopicSpace
+import           Control.Lens                       ((^.))
+import           Data.Generics.Product              (field)
 import qualified Data.List                          as List
 import           XMonad
 import           XMonad.Actions.CycleWS             (swapNextScreen)
 import           XMonad.Actions.Search
+import           XMonad.CustomPrompt
 import           XMonad.Hooks.EwmhDesktops          (ewmh, ewmhDesktopsStartup)
 import           XMonad.Hooks.SetWMName             (setWMName)
 import           XMonad.Hooks.UrgencyHook           (args, dzenUrgencyHook,
@@ -30,11 +32,13 @@ import           XMonad.Layout.Tabbed               (TabbedDecoration,
                                                      Theme (..), shrinkText,
                                                      tabbed)
 import           XMonad.Layout.ToggleLayouts        (ToggleLayout (..))
+import           XMonad.Password
 import           XMonad.Prompt.RunOrRaise           (runOrRaisePrompt)
 import qualified XMonad.StackSet                    as W
+import           XMonad.TopicSpace
 import           XMonad.Util.EZConfig
 
-import           XMonad.XMobar                             (zenburnPP)
+import           XMonad.XMobar                      (zenburnPP)
 
 import           Data.Monoid                        (Endo, (<>))
 
@@ -73,7 +77,7 @@ scratchSubmaps conf = submapName . mkNamedKeymap conf $ [
 -- Search engines inside submaps
 searchSubmaps :: ExtraConfig -> XConfig l -> NamedAction
 searchSubmaps extraConfig conf =
-    let mkBrowser = promptSearchBrowser def "qutebrowser"
+    let mkBrowser = promptSearchBrowser def (extraConfig ^. field @"applications" . field @"browser")
         _googleP = addName "Search google" $ mkBrowser google
         ddgP = addName "Search duckduckgo" $ mkBrowser (searchEngine "duckduckgo" "http://duckduckgo.com/?q=")
         extras = [(key, addName name $ mkBrowser (searchEngine name url)) | Search{..} <- searchEndpoints extraConfig]
