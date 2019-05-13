@@ -10,6 +10,7 @@ data Applications =
                , prompt :: FilePath
                , screenshot :: FilePath
                , urxvt :: FilePath
+               , musicToggle :: FilePath
                } deriving (Show, Generic)
 
 data TopicRule =

@@ -59,9 +59,9 @@ import           XMonad.Hooks.DynamicLog            (statusBar)
 
 import qualified Data.Set                           as S
 
-spotify :: XConfig l -> NamedAction
-spotify conf = submapName . mkNamedKeymap conf $
-   [ ("M-p", addName "Play" $ spawn "sp play") ]
+spotify :: ExtraConfig -> XConfig l -> NamedAction
+spotify extraConf conf = submapName . mkNamedKeymap conf $
+   [ ("M-p", addName "Play" $ spawn (musicToggle . applications $ extraConf)) ]
 
 scratchpads :: [NamedScratchpad]
 scratchpads = [
@@ -178,9 +178,8 @@ myKeys extraConfig conf =
                      , ("<XF86AudioLowerVolume>", addName "Decrease volume" $ spawn "amixer set Master 2%-")
                      , ("M-<plus>", addName "Increase volume" $ spawn "amixer set Master 2+")
                      , ("M-<minus>", addName "Decrease volume" $ spawn "amixer set Master 2-")
-                     -- , ("<XF86AudioPlay>", addName "Play/pause spotify" $ spawn "/home/masse/.local/bin/sp play")
                      , ("<XF86AudioPlay>", addName "Play/pause mopidy" $ spawn "mpc toggle")
-                     , ("M-m", spotify conf)
+                     , ("M-m", spotify extraConfig conf)
                      , ("M-S-<Space>", addName "Swap screens" swapNextScreen)
                      , ("M-<Backspace>", addName "Kill window" kill)
                      -- scrot requires `unGrab`
