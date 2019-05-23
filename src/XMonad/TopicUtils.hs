@@ -26,11 +26,11 @@ safeRunInTerm dir Nothing = safeSpawn "urxvt" ["-cd", dir]
 safeRunInTerm dir (Just command) = safeSpawn "urxvt" ["-cd", dir, "-e", command]
 
 inactiveTags :: X [WorkspaceId]
-inactiveTags = map W.tag . inactive' <$> gets windowset
+inactiveTags = inactive' <$> gets windowset
     where
         inactive' s =
           let current = W.currentTag s
-          in W.hidden s ++ map W.workspace (filter (\w -> current /= (W.tag . W.workspace) w) (W.visible s))
+          in filter (current /=) . map W.tag $ W.hidden s <> map W.workspace (W.visible s)
 
 gridselectMove :: GSConfig WorkspaceId -> X ()
 gridselectMove conf = do
@@ -50,7 +50,10 @@ gsConfig = def{gs_navigate = navNSearch, gs_colorizer = fromClassName}
 -- - Takes a topicspace viewfunc
 gridselectWorkspace :: GSConfig WorkspaceId -> (WorkspaceId -> X ()) -> X ()
 gridselectWorkspace conf viewFunc = withWindowSet $ \ws -> do
-  let wss = map W.tag . W.hidden $ ws
+  let wss = filter (/= current) . map W.tag $ invisible <> visible
+      visible = fmap W.workspace (W.visible ws)
+      invisible = W.hidden ws
+      current = W.currentTag ws
   gridselect conf (zip wss wss) >>= flip whenJust viewFunc
 
 gotoSelected' :: GSConfig Window -> X ()
