@@ -42,7 +42,6 @@ myTopicConfig extraConfig =
 topicKeys' :: ExtraConfig -> XConfig l -> [(String, NamedAction)]
 topicKeys' extraConfig conf = [ ("M-y", addName "Change topic" $ visualSelect (myTopicConfig extraConfig))
                               , ("M-S-g", addName "Move window to topic" $ gridselectMove def)
-                              , ("M-u", addName "Select window" $ gotoSelected' def{gs_colorizer = fromClassName})
                               , ("M-<Return>", addName "Open project action" $ currentTopicAction' (myTopicConfig extraConfig))
                               , ("M-w", modificationSubmaps' conf)]
 
