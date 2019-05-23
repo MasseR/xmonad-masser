@@ -10,8 +10,6 @@ before_script:
 matrix:
   include:
   - env:
-    - NIXPKGS=https://github.com/NixOS/nixpkgs-channels/archive/nixos-18.09.tar.gz
-  - env:
     - NIXPKGS=https://github.com/NixOS/nixpkgs-channels/archive/nixos-19.03.tar.gz
   - env:
     - NIXPKGS=https://github.com/NixOS/nixpkgs-channels/archive/nixos-unstable.tar.gz
