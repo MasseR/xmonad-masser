@@ -28,7 +28,9 @@ safeRunInTerm dir (Just command) = safeSpawn "urxvt" ["-cd", dir, "-e", command]
 inactiveTags :: X [WorkspaceId]
 inactiveTags = map W.tag . inactive' <$> gets windowset
     where
-        inactive' s = W.hidden s ++ map W.workspace (filter (\w -> (W.tag . W.workspace . W.current) s /= (W.tag . W.workspace) w) (W.visible s))
+        inactive' s =
+          let current = W.currentTag s
+          in W.hidden s ++ map W.workspace (filter (\w -> current /= (W.tag . W.workspace) w) (W.visible s))
 
 gridselectMove :: GSConfig WorkspaceId -> X ()
 gridselectMove conf = do

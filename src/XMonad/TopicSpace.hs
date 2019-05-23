@@ -4,7 +4,6 @@ module XMonad.TopicSpace (topicKeys', addTopic, TopicAction(..)) where
 import XMonad.Actions.TopicSpace
 import XMonad
 import qualified Data.Map as M
-import XMonad.Actions.GridSelect
 import XMonad.Actions.DynamicWorkspaces
 import XMonad.TopicUtils
 import XMonad.Util.EZConfig (mkNamedKeymap)
