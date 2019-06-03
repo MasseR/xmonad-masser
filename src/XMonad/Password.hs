@@ -54,4 +54,4 @@ mkPassPrompt label f conf = do
 
 
 selectPassword :: String -> X ()
-selectPassword pass = spawn $ "pass --clip " ++ pass
+selectPassword pass = spawn $ "PASSWORD_STORE_CLIP_TIME=10 pass --clip " ++ pass
