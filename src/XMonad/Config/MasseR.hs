@@ -1,7 +1,8 @@
-{-# LANGUAGE DataKinds         #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards   #-}
-{-# LANGUAGE TypeApplications  #-}
+{-# LANGUAGE DataKinds           #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE RecordWildCards     #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications    #-}
 module XMonad.Config.MasseR  where
 
 
@@ -23,7 +24,7 @@ import           XMonad.Layout.Decoration           (Decoration,
 import           XMonad.Layout.DwmStyle
 import           XMonad.Layout.LayoutModifier       (ModifiedLayout)
 import           XMonad.Layout.Master
-import           XMonad.Layout.NoBorders            (smartBorders)
+import           XMonad.Layout.NoBorders            (noBorders, smartBorders)
 import           XMonad.Layout.PerWorkspace         (onWorkspace)
 import           XMonad.Layout.Renamed
 import           XMonad.Layout.Simplest             (Simplest)
@@ -31,7 +32,8 @@ import           XMonad.Layout.Spiral
 import           XMonad.Layout.Tabbed               (TabbedDecoration,
                                                      Theme (..), shrinkText,
                                                      tabbed)
-import           XMonad.Layout.ToggleLayouts        (ToggleLayout (..))
+import           XMonad.Layout.ToggleLayouts        (ToggleLayout (..),
+                                                     toggleLayouts)
 import           XMonad.Password
 import           XMonad.Prompt.RunOrRaise           (runOrRaisePrompt)
 import qualified XMonad.StackSet                    as W
@@ -205,6 +207,7 @@ myKeys extraConfig conf =
                       ] ^++^
     subKeys "Projects & Workspaces" (topicKeys' extraConfig conf) ^++^
     subKeys "Layout management" [ ("M-C-<Space>", addName "Toggle layout" $ sendMessage ToggleLayout)
+                                , ("M-z", addName "Toggle zoom" $ sendMessage (Toggle "Zoom"))
                                 , ("M-<Space>", addName "Next layout" $ sendMessage NextLayout)] ^++^
     subKeys "Resize" []
   where
@@ -240,13 +243,15 @@ masser extraConfig = xmonad =<< statusBar (bar extraConfig) zenburnPP toggleStru
                        , manageHook = myManageHook
                        , focusFollowsMouse = False
                      }
-    myLayout = onWorkspace "web" webLayout $
-               onWorkspace "dynamics" webLayout $
-               onWorkspace "pdf" pdfLayout $
-               onWorkspace "documents" documentLayout $
-               onWorkspace "mail" mailLayout
-               defLayout
+    myLayout = toggleLayouts zoom workspaceLayouts
       where
+        zoom = renamed [Replace "Zoom"] (noBorders Full)
+        workspaceLayouts = onWorkspace "web" webLayout $
+                           onWorkspace "dynamics" webLayout $
+                           onWorkspace "pdf" pdfLayout $
+                           onWorkspace "documents" documentLayout $
+                           onWorkspace "mail" mailLayout
+                           defLayout
         -- Default layout
         defLayout = tiled ||| tabLayout ||| readLayout ||| bspLayout ||| vimLayout ||| spiral (6/7) ||| Full
         -- Pdfs are restricted to tabs
