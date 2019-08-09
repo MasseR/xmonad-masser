@@ -211,7 +211,7 @@ myKeys extraConfig conf =
                                 , ("M-<Space>", addName "Next layout" $ sendMessage NextLayout)] ^++^
     subKeys "Resize" []
   where
-    locker = "sh ~/scripts/lock.sh"
+    locker = "xset s activate"
 
 
 
