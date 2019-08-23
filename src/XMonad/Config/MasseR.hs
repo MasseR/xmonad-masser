@@ -49,6 +49,7 @@ import           XMonad.Util.SpawnOnce
 
 import           System.IO                          (hClose, hPutStr)
 import           XMonad.Actions.Navigation2D
+import           XMonad.Actions.UpdatePointer       (updatePointer)
 import           XMonad.Util.NamedActions
 import           XMonad.Util.Run                    (spawnPipe)
 
@@ -241,7 +242,8 @@ masser extraConfig = xmonad =<< statusBar (bar extraConfig) zenburnPP toggleStru
                        , normalBorderColor = "#262626"
                        , focusedBorderColor = "#7F9F7F"
                        , manageHook = myManageHook
-                       , focusFollowsMouse = False
+                       , focusFollowsMouse = True
+                       , logHook = updatePointer (0.25, 0.25) (0.25, 0.25)
                      }
     myLayout = toggleLayouts zoom workspaceLayouts
       where
