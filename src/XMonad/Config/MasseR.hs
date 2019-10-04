@@ -83,10 +83,11 @@ searchSubmaps extraConfig conf =
     let mkBrowser = promptSearchBrowser def (extraConfig ^. field @"applications" . field @"browser")
         _googleP = addName "Search google" $ mkBrowser google
         ddgP = addName "Search duckduckgo" $ mkBrowser (searchEngine "duckduckgo" "http://duckduckgo.com/?q=")
+        searx = addName "Search searx" $ mkBrowser (searchEngine "searx" "https://searx.me/?q=")
         extras = [(key, addName name $ mkBrowser (searchEngine name url)) | Search{..} <- searchEndpoints extraConfig]
     in submapName . mkNamedKeymap conf $
-            [ ("d", ddgP) -- Training to use ddg again
-            , ("g", ddgP) -- training to use ddg again
+            [ ("d", searx) -- Training to use ddg again
+            , ("g", searx) -- training to use ddg again
             ] ++ extras
 
 
