@@ -36,6 +36,7 @@ import           XMonad.Layout.ToggleLayouts        (ToggleLayout (..),
                                                      toggleLayouts)
 import           XMonad.Password
 import           XMonad.Prompt.RunOrRaise           (runOrRaisePrompt)
+import           XMonad.Prompt.Shell                (shellPrompt)
 import qualified XMonad.StackSet                    as W
 import           XMonad.TopicSpace
 import           XMonad.Util.EZConfig
@@ -82,7 +83,7 @@ searchSubmaps :: ExtraConfig -> XConfig l -> NamedAction
 searchSubmaps extraConfig conf =
     let mkBrowser = promptSearchBrowser def (extraConfig ^. field @"applications" . field @"browser")
         _googleP = addName "Search google" $ mkBrowser google
-        ddgP = addName "Search duckduckgo" $ mkBrowser (searchEngine "duckduckgo" "http://duckduckgo.com/?q=")
+        _ddgP = addName "Search duckduckgo" $ mkBrowser (searchEngine "duckduckgo" "http://duckduckgo.com/?q=")
         searx = addName "Search searx" $ mkBrowser (searchEngine "searx" "https://searx.me/?q=")
         extras = [(key, addName name $ mkBrowser (searchEngine name url)) | Search{..} <- searchEndpoints extraConfig]
     in submapName . mkNamedKeymap conf $
@@ -188,13 +189,12 @@ myKeys extraConfig conf =
                      , ("M-<Backspace>", addName "Kill window" kill)
                      -- scrot requires `unGrab`
                      , ("M-<Print>", addName "Take screenshot" $ spawn (screenshot . applications $ extraConfig))] ^++^
-    subKeys "Launchers" [ ("M-S-y", addName "Open youtube" $ spawn "mpv $(clip -o)")
-                        , ("M-S-<Return>", addName "Open terminal" $ spawn $ XMonad.terminal conf)
+    subKeys "Launchers" [ ("M-S-<Return>", addName "Open terminal" $ spawn $ XMonad.terminal conf)
                         , ("M-n", scratchSubmaps conf)
                         , ("M-s", searchSubmaps extraConfig conf)
                         , ("M-p", addName "Retrieve password" $ passPrompt def)
-                        , ("M-S-e", addName "Open with app" xdgOpen)
-                        , ("M-e", addName "Run app" $ runOrRaisePrompt def)] ^++^
+                        , ("M-e", addName "Run app" $ runOrRaisePrompt def)
+                        , ("M-S-e", addName "Run shell command" $ shellPrompt def)] ^++^
     subKeys "Windows" [ ("M-j", addName "Go down" $ windowGo D False)
                       , ("M-k", addName "Go up" $ windowGo U False)
                       , ("M-h", addName "Go left" $ windowGo L False)
