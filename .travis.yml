@@ -10,10 +10,10 @@ before_script:
 matrix:
   include:
   - env:
-    - NIXPKGS=https://github.com/NixOS/nixpkgs-channels/archive/nixos-19.03.tar.gz
+    - VERSION=19.09
   - env:
-    - NIXPKGS=https://github.com/NixOS/nixpkgs-channels/archive/nixos-unstable.tar.gz
+    - VERSION=unstable
 
 script:
   - nix run nixpkgs.haskellPackages.hlint -c hlint src
-  - nix build -I nixpkgs=$NIXPKGS -f ./release.nix xmonad-masser
+  - nix build -I nixpkgs=https://github.com/NixOS/nixpkgs-channels/archive/nixos-$VERSION.tar.gz -f ./release.nix xmonad-masser
