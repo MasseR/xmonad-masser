@@ -238,7 +238,11 @@ masser extraConfig = xmonad =<< statusBar (bar extraConfig) zenburnPP toggleStru
                        , normalBorderColor = "#262626"
                        , focusedBorderColor = "#7F9F7F"
                        , manageHook = myManageHook
-                       , focusFollowsMouse = True
+                       -- The focus follows mouse is a bad idea for me because
+                       -- it misbehaves with accordion. If I accidentally hover
+                       -- my mouse at the lower edge of the accordion, it will
+                       -- just cycle through to the last accordion
+                       , focusFollowsMouse = False
                        , logHook = updatePointer (0.25, 0.25) (0.25, 0.25)
                      }
     myLayout = toggleLayouts zoom workspaceLayouts
