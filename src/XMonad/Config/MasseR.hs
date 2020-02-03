@@ -123,14 +123,10 @@ myManageHook = composeAll $ concat [
     , documentHooks
     , floatHooks
     , debuggerHooks
-    , ideHooks
     , flowHook
   ]
   where
     classHook y = map (\x -> className =? x --> y)
-    ideHooks = classHook (doShift "eclipse") [
-            "Anypoint Studio"
-        ]
     webHooks = classHook (doShift "web") [
           "Firefox"
         , "qutebrowser"
@@ -150,7 +146,7 @@ myManageHook = composeAll $ concat [
           "libreoffice"
         , "libreoffice-calc"
         , "Assistant"
-        , "Bouml"
+        , "Bouml" -- Oh wow, didn't even remember this existed
       ]
     floatHooks = classHook doFloat [
           "SMplayer"
@@ -158,11 +154,11 @@ myManageHook = composeAll $ concat [
         , "MPlayer"
         , "Kaffeine"
         , "Xmessage"
-        , "Wfica_Seamless"
+        , "Wfica_Seamless" -- I think this is citrix
         , "mpv"
       ]
     debuggerHooks = classHook (doShift "debugger") [
-          "JSwat Debugger",
+          "JSwat Debugger", -- Haven't used this in years. A good thing?
           "DBeaver"
       ]
     dynamicsHook = [title =~? "Dynamics" --> doShift "dynamics"]
