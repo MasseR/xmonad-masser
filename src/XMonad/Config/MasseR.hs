@@ -12,7 +12,6 @@ import qualified Data.List                          as List
 import           XMonad
 import           XMonad.Actions.CycleWS             (swapNextScreen)
 import           XMonad.Actions.Search
-import           XMonad.CustomPrompt
 import           XMonad.Hooks.EwmhDesktops          (ewmh, ewmhDesktopsStartup)
 import           XMonad.Hooks.SetWMName             (setWMName)
 import           XMonad.Hooks.UrgencyHook           (args, dzenUrgencyHook,
@@ -82,14 +81,10 @@ scratchSubmaps conf = submapName . mkNamedKeymap conf $ [
 searchSubmaps :: ExtraConfig -> XConfig l -> NamedAction
 searchSubmaps extraConfig conf =
     let mkBrowser = promptSearchBrowser def (extraConfig ^. field @"applications" . field @"browser")
-        _googleP = addName "Search google" $ mkBrowser google
-        _ddgP = addName "Search duckduckgo" $ mkBrowser (searchEngine "duckduckgo" "http://duckduckgo.com/?q=")
-        searx = addName "Search searx" $ mkBrowser (searchEngine "searx" "https://searx.me/?q=")
+        googleP = addName "Search google" $ mkBrowser google
         extras = [(key, addName name $ mkBrowser (searchEngine name url)) | Search{..} <- searchEndpoints extraConfig]
     in submapName . mkNamedKeymap conf $
-            [ ("d", searx) -- Training to use ddg again
-            , ("g", searx) -- training to use ddg again
-            ] ++ extras
+            ("g", googleP) : extras
 
 
 myNav2d :: Navigation2DConfig
