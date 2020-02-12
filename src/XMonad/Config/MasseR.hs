@@ -10,7 +10,7 @@ import           Control.Lens                       ((^.))
 import           Data.Generics.Product              (field)
 import qualified Data.List                          as List
 import           XMonad
-import           XMonad.Actions.CycleWS             (swapNextScreen)
+-- import           XMonad.Actions.CycleWS             (swapNextScreen)
 import           XMonad.Actions.Search
 import           XMonad.Hooks.EwmhDesktops          (ewmh, ewmhDesktopsStartup)
 import           XMonad.Hooks.SetWMName             (setWMName)
@@ -88,7 +88,12 @@ searchSubmaps extraConfig conf =
 
 
 myNav2d :: Navigation2DConfig
-myNav2d = def { defaultTiledNavigation = hybridOf lineNavigation sideNavigation }
+myNav2d =
+  def { defaultTiledNavigation = nav
+      , screenNavigation = nav
+      }
+  where
+    nav = hybridOf lineNavigation sideNavigation
 
 showKeybindings :: [((KeyMask, KeySym), NamedAction)] -> NamedAction
 showKeybindings x = addName "Show keybindings" $ io $ do
@@ -174,9 +179,9 @@ myKeys extraConfig conf =
                      , ("<XF86AudioLowerVolume>", addName "Decrease volume" $ spawn "amixer set Master 2%-")
                      , ("M-<plus>", addName "Increase volume" $ spawn "amixer set Master 2+")
                      , ("M-<minus>", addName "Decrease volume" $ spawn "amixer set Master 2-")
-                     , ("<XF86AudioPlay>", addName "Play/pause mopidy" $ spawn "mpc toggle")
+                     , ("<XF86AudioPlay>", addName "Play/pause music" $ spawn "mpc toggle")
                      , ("M-m", spotify extraConfig conf)
-                     , ("M-S-<Space>", addName "Swap screens" swapNextScreen)
+                     -- , ("M-S-<Space>", addName "Swap screens" swapNextScreen)
                      , ("M-<Backspace>", addName "Kill window" kill)
                      -- scrot requires `unGrab`
                      , ("M-<Print>", addName "Take screenshot" $ spawn (screenshot . applications $ extraConfig))] ^++^
@@ -190,6 +195,9 @@ myKeys extraConfig conf =
                       , ("M-k", addName "Go up" $ windowGo U False)
                       , ("M-h", addName "Go left" $ windowGo L False)
                       , ("M-l", addName "Go right" $ windowGo R False)
+                      -- Swap screen left or right, don't wrap
+                      , ("M-S-h", addName "Shift window up" $ screenSwap L True)
+                      , ("M-S-l", addName "Shift window right" $ screenSwap R True)
                       -- , ("M-S-j", addName "Shift window down" $ windowSwap D False)
                       -- , ("M-S-k", addName "Shift window up" $ windowSwap U False)
                       -- , ("M-S-h", addName "Shift window left" $ windowSwap L False)
