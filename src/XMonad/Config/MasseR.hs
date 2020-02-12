@@ -88,7 +88,7 @@ searchSubmaps extraConfig conf =
 
 
 myNav2d :: Navigation2DConfig
-myNav2d = def { defaultTiledNavigation = lineNavigation }
+myNav2d = def { defaultTiledNavigation = hybridOf lineNavigation sideNavigation }
 
 showKeybindings :: [((KeyMask, KeySym), NamedAction)] -> NamedAction
 showKeybindings x = addName "Show keybindings" $ io $ do
