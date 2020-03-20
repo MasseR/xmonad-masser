@@ -12,27 +12,6 @@ import XMonad.Hooks.SetWMName
        (setWMName)
 import XMonad.Hooks.UrgencyHook
        (args, dzenUrgencyHook, withUrgencyHook)
-import XMonad.Layout.Accordion
-import XMonad.Layout.BinarySpacePartition
-       (emptyBSP)
-import XMonad.Layout.Decoration
-       (Decoration, DefaultShrinker)
-import XMonad.Layout.DwmStyle
-import XMonad.Layout.LayoutModifier
-       (ModifiedLayout)
-import XMonad.Layout.Master
-import XMonad.Layout.NoBorders
-       (noBorders, smartBorders)
-import XMonad.Layout.PerWorkspace
-       (onWorkspace)
-import XMonad.Layout.Renamed
-import XMonad.Layout.Simplest
-       (Simplest)
-import XMonad.Layout.Spiral
-import XMonad.Layout.Tabbed
-       (TabbedDecoration, tabbed)
-import XMonad.Layout.ToggleLayouts
-       (toggleLayouts)
 
 import XMonad.XMobar
        (zenburnPP)
@@ -52,6 +31,7 @@ import XMonad.Util.Run
        (spawnPipe)
 
 import XMonad.Config.MasseR.Bindings
+import XMonad.Config.MasseR.Layouts
 import XMonad.Config.MasseR.ExtraConfig
 
 
@@ -78,20 +58,6 @@ showKeybindings x = addName "Show keybindings" $ io $ do
     h <- spawnPipe "zenity --text-info --font=terminus"
     hPutStr h (unlines $ showKm x)
     hClose h
-
-
--- Layout
-myTabConfig ::  Theme
-myTabConfig = def {
-      activeBorderColor = "#DCDCCC"
-    , activeTextColor = "#DCDCCC"
-    , activeColor = "#3F3F3F"
-    , fontName = "xft:Inconsolata-9"
-    , inactiveBorderColor = "#262626"
-    , inactiveTextColor = "#9FAFAF"
-    , inactiveColor = "#262626"
-  }
-
 
 (=~?) :: XMonad.Query String -> String -> XMonad.Query Bool
 q =~? x = fmap (x `List.isInfixOf`) q
@@ -169,7 +135,7 @@ masser extraConfig = xmonad =<< statusBar (bar extraConfig) zenburnPP toggleStru
                        , workspaces = let defaults = ["irc", "web", "mail"]
                                           external = map (T.unpack . topicName) . topics $ extraConfig
                                       in S.toList (S.fromList defaults <> S.fromList external)
-                       , layoutHook = smartBorders myLayout
+                       , layoutHook = layout
                        , clickJustFocuses = False
                        , startupHook = myStartupHook >> ewmhDesktopsStartup >> setWMName "LG3D"
                        , borderWidth = 2
@@ -183,31 +149,3 @@ masser extraConfig = xmonad =<< statusBar (bar extraConfig) zenburnPP toggleStru
                        , focusFollowsMouse = False
                        , logHook = updatePointer (0.25, 0.25) (0.25, 0.25)
                      }
-    myLayout = toggleLayouts zoom workspaceLayouts
-      where
-        zoom = renamed [Replace "Zoom"] (noBorders Full)
-        workspaceLayouts = onWorkspace "web" webLayout $
-                           onWorkspace "dynamics" webLayout $
-                           onWorkspace "pdf" pdfLayout $
-                           onWorkspace "documents" documentLayout $
-                           onWorkspace "mail" mailLayout
-                           defLayout
-        -- Default layout
-        defLayout = tiled ||| tabLayout ||| readLayout ||| bspLayout ||| vimLayout ||| spiral (6/7) ||| Full
-        -- Pdfs are restricted to tabs
-        vimLayout = Mirror (mastered (1/100) (4/5) Accordion)
-        pdfLayout =  readLayout ||| tiled ||| tabLayout
-        readLayout = renamed [Replace "2/3"] (dwmStyle shrinkText myTabConfig (mastered (1/100) (2/3) Accordion))
-        bspLayout = renamed [Replace "master bsp"] (dwmStyle shrinkText myTabConfig (mastered (1/100) (2/3) (Mirror emptyBSP)))
-        -- Documents are by default tabs, but have looser restrictions
-        documentLayout = tabLayout ||| Full ||| tiled ||| Mirror tiled
-        -- Web is either tabbed, full, or tiled
-        webLayout = readLayout ||| tabLayout ||| Full ||| tiled
-        tiled = Tall nmaster delta ratio
-        -- I need to restrict the type or type inferencer can't deduce type classes
-        tabLayout :: ModifiedLayout (Decoration TabbedDecoration DefaultShrinker) Simplest Window
-        tabLayout = tabbed shrinkText myTabConfig
-        mailLayout = readLayout ||| tabLayout
-        delta = 3/100
-        ratio = 1/2
-        nmaster = 1
