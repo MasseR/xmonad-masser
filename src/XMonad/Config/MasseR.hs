@@ -177,6 +177,7 @@ myKeys extraConfig conf =
     subKeys "System" [ ("<XF86Sleep>", addName "Suspend machine" $ spawn "sudo pm-suspend")
                      , ("<XF86AudioRaiseVolume>", addName "Increase volume" $ spawn "amixer set Master 2%+")
                      , ("<XF86AudioLowerVolume>", addName "Decrease volume" $ spawn "amixer set Master 2%-")
+                     , ("<XF86Favorites>", addName "Toggle microphone" $ spawn "pactl set-source-mute @DEFAULT_SOURCE@ toggle")
                      , ("M-<plus>", addName "Increase volume" $ spawn "amixer set Master 2+")
                      , ("M-<minus>", addName "Decrease volume" $ spawn "amixer set Master 2-")
                      , ("<XF86AudioPlay>", addName "Play/pause music" $ spawn "mpc toggle")
