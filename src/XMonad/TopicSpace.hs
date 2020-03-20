@@ -1,13 +1,22 @@
-{-# Language RecordWildCards #-}
-module XMonad.TopicSpace (topicKeys', addTopic, TopicAction(..)) where
+{-# LANGUAGE RecordWildCards #-}
+module XMonad.TopicSpace
+  ( visualSelect
+  , gridselectMove
+  , currentTopicAction'
+  , addWorkspacePrompt
+  , copyTopic
+  , removeEmptyWorkspace
+  , topicConfig
+  , addTopic
+  , TopicAction(..)
+  )
+  where
 
-import XMonad.Actions.TopicSpace
-import XMonad
 import qualified Data.Map as M
+import XMonad
 import XMonad.Actions.DynamicWorkspaces
+import XMonad.Actions.TopicSpace
 import XMonad.TopicUtils
-import XMonad.Util.EZConfig (mkNamedKeymap)
-import XMonad.Util.NamedActions
 
 import XMonad.Config.MasseR.ExtraConfig
 
@@ -26,8 +35,8 @@ addTopic TopicAction{..} = EndoM $ \super -> let
   in pure super { topicDirs = newDirs
                 , topicActions = newActions }
 
-myTopicConfig :: ExtraConfig -> TopicConfig
-myTopicConfig extraConfig =
+topicConfig :: ExtraConfig -> TopicConfig
+topicConfig extraConfig =
   let dirs = M.fromList [ (T.unpack n, T.unpack d) | TopicRule n (Just d) _ <- topics extraConfig ]
       actions = M.fromList [ (T.unpack n, spawn (T.unpack a)) | TopicRule n _ (Just a) <- topics extraConfig ]
   in def {
@@ -38,20 +47,8 @@ myTopicConfig extraConfig =
   }
 
 
-topicKeys' :: ExtraConfig -> XConfig l -> [(String, NamedAction)]
-topicKeys' extraConfig conf = [ ("M-y", addName "Change topic" $ visualSelect (myTopicConfig extraConfig))
-                              , ("M-S-g", addName "Move window to topic" $ gridselectMove def)
-                              , ("M-<Return>", addName "Open project action" $ currentTopicAction' (myTopicConfig extraConfig))
-                              , ("M-w", modificationSubmaps' conf)]
-
-
 spawnShellIn :: Dir -> X ()
 spawnShellIn dir = safeRunInTerm dir Nothing
 
 
-modificationSubmaps' :: XConfig l -> NamedAction
-modificationSubmaps' conf =
-    submapName $ mkNamedKeymap conf [ ("a", addName "Add a new workspace" $ addWorkspacePrompt def)
-                                    , ("w", addName "Copy project" copyTopic)
-                                    , ("d", addName "Remove empty workspace" removeEmptyWorkspace)]
 

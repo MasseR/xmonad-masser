@@ -1,90 +1,68 @@
-{-# LANGUAGE DataKinds           #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE RecordWildCards     #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeApplications    #-}
 module XMonad.Config.MasseR  where
 
 
-import           Control.Lens                       ((^.))
-import           Data.Generics.Product              (field)
-import qualified Data.List                          as List
-import           XMonad
--- import           XMonad.Actions.CycleWS             (swapNextScreen)
-import           XMonad.Actions.Search
-import           XMonad.Hooks.EwmhDesktops          (ewmh, ewmhDesktopsStartup)
-import           XMonad.Hooks.SetWMName             (setWMName)
-import           XMonad.Hooks.UrgencyHook           (args, dzenUrgencyHook,
-                                                     withUrgencyHook)
-import           XMonad.Layout.Accordion
-import           XMonad.Layout.BinarySpacePartition (emptyBSP)
-import           XMonad.Layout.Decoration           (Decoration,
-                                                     DefaultShrinker)
-import           XMonad.Layout.DwmStyle
-import           XMonad.Layout.LayoutModifier       (ModifiedLayout)
-import           XMonad.Layout.Master
-import           XMonad.Layout.NoBorders            (noBorders, smartBorders)
-import           XMonad.Layout.PerWorkspace         (onWorkspace)
-import           XMonad.Layout.Renamed
-import           XMonad.Layout.Simplest             (Simplest)
-import           XMonad.Layout.Spiral
-import           XMonad.Layout.Tabbed               (TabbedDecoration,
-                                                     Theme (..), shrinkText,
-                                                     tabbed)
-import           XMonad.Layout.ToggleLayouts        (ToggleLayout (..),
-                                                     toggleLayouts)
-import           XMonad.Password
-import           XMonad.Prompt.RunOrRaise           (runOrRaisePrompt)
-import           XMonad.Prompt.Shell                (shellPrompt)
-import qualified XMonad.StackSet                    as W
-import           XMonad.TopicSpace
-import           XMonad.Util.EZConfig
+import qualified Data.List as List
+import XMonad
+import XMonad.Hooks.EwmhDesktops
+       (ewmh, ewmhDesktopsStartup)
+import XMonad.Hooks.SetWMName
+       (setWMName)
+import XMonad.Hooks.UrgencyHook
+       (args, dzenUrgencyHook, withUrgencyHook)
+import XMonad.Layout.Accordion
+import XMonad.Layout.BinarySpacePartition
+       (emptyBSP)
+import XMonad.Layout.Decoration
+       (Decoration, DefaultShrinker)
+import XMonad.Layout.DwmStyle
+import XMonad.Layout.LayoutModifier
+       (ModifiedLayout)
+import XMonad.Layout.Master
+import XMonad.Layout.NoBorders
+       (noBorders, smartBorders)
+import XMonad.Layout.PerWorkspace
+       (onWorkspace)
+import XMonad.Layout.Renamed
+import XMonad.Layout.Simplest
+       (Simplest)
+import XMonad.Layout.Spiral
+import XMonad.Layout.Tabbed
+       (TabbedDecoration, tabbed)
+import XMonad.Layout.ToggleLayouts
+       (toggleLayouts)
 
-import           XMonad.XMobar                      (zenburnPP)
+import XMonad.XMobar
+       (zenburnPP)
 
-import           Data.Monoid                        (Endo, (<>))
+import Data.Monoid
+       (Endo)
 
-import           XMonad.Util.NamedScratchpad
-import           XMonad.Util.SpawnOnce
+import XMonad.Util.SpawnOnce
 
-import           System.IO                          (hClose, hPutStr)
-import           XMonad.Actions.Navigation2D
-import           XMonad.Actions.UpdatePointer       (updatePointer)
-import           XMonad.Util.NamedActions
-import           XMonad.Util.Run                    (spawnPipe)
+import System.IO
+       (hClose, hPutStr)
+import XMonad.Actions.Navigation2D
+import XMonad.Actions.UpdatePointer
+       (updatePointer)
+import XMonad.Util.NamedActions
+import XMonad.Util.Run
+       (spawnPipe)
 
-import           XMonad.Config.MasseR.ExtraConfig
--- import Customizations
+import XMonad.Config.MasseR.Bindings
+import XMonad.Config.MasseR.ExtraConfig
 
-import qualified Data.Text                          as T
 
-import           XMonad.Hooks.DynamicLog            (statusBar)
+import qualified Data.Text as T
 
-import qualified Data.Set                           as S
+import XMonad.Hooks.DynamicLog
+       (statusBar)
 
-spotify :: ExtraConfig -> XConfig l -> NamedAction
-spotify extraConf conf = submapName . mkNamedKeymap conf $
-   [ ("M-p", addName "Play" $ spawn (musicToggle . applications $ extraConf)) ]
+import qualified Data.Set as S
 
-scratchpads :: [NamedScratchpad]
-scratchpads = [
-    NS "notes" "vim -g --role notes -c 'e ~/wikidata/index.md'" (wmRole =? "notes") nonFloating
-    ]
-    where wmRole = stringProperty "WM_WINDOW_ROLE"
 
-scratchSubmaps :: XConfig l -> NamedAction
-scratchSubmaps conf = submapName . mkNamedKeymap conf $ [
-    ("M-n", addName "Open notes" $ namedScratchpadAction scratchpads "notes")
-    ]
-
--- Search engines inside submaps
-searchSubmaps :: ExtraConfig -> XConfig l -> NamedAction
-searchSubmaps extraConfig conf =
-    let mkBrowser = promptSearchBrowser def (extraConfig ^. field @"applications" . field @"browser")
-        googleP = addName "Search google" $ mkBrowser google
-        extras = [(key, addName name $ mkBrowser (searchEngine name url)) | Search{..} <- searchEndpoints extraConfig]
-    in submapName . mkNamedKeymap conf $
-            ("g", googleP) : extras
 
 
 myNav2d :: Navigation2DConfig
@@ -169,51 +147,6 @@ myManageHook = composeAll $ concat [
     dynamicsHook = [title =~? "Dynamics" --> doShift "dynamics"]
     flowHook = [title =~? "www.flowdock.com" --> doShift "flowdock"]
 
-myKeys :: ExtraConfig -> XConfig l -> [((KeyMask, KeySym), NamedAction)]
-myKeys extraConfig conf =
-    let subKeys str ks = subtitle str : mkNamedKeymap conf ks in
-    subKeys "Actions" [ ("M-S-r", addName "foobar" (recompile True >> spawn "xmonad --restart"))
-                      , ("M-C-l", addName "Lock screen" $ spawn locker)] ^++^
-    subKeys "System" [ ("<XF86Sleep>", addName "Suspend machine" $ spawn "sudo pm-suspend")
-                     , ("<XF86AudioRaiseVolume>", addName "Increase volume" $ spawn "amixer set Master 2%+")
-                     , ("<XF86AudioLowerVolume>", addName "Decrease volume" $ spawn "amixer set Master 2%-")
-                     , ("<XF86Favorites>", addName "Toggle microphone" $ spawn "pactl set-source-mute @DEFAULT_SOURCE@ toggle")
-                     , ("M-<plus>", addName "Increase volume" $ spawn "amixer set Master 2+")
-                     , ("M-<minus>", addName "Decrease volume" $ spawn "amixer set Master 2-")
-                     , ("<XF86AudioPlay>", addName "Play/pause music" $ spawn "mpc toggle")
-                     , ("M-m", spotify extraConfig conf)
-                     -- , ("M-S-<Space>", addName "Swap screens" swapNextScreen)
-                     , ("M-<Backspace>", addName "Kill window" kill)
-                     -- scrot requires `unGrab`
-                     , ("M-<Print>", addName "Take screenshot" $ spawn (screenshot . applications $ extraConfig))] ^++^
-    subKeys "Launchers" [ ("M-S-<Return>", addName "Open terminal" $ spawn $ XMonad.terminal conf)
-                        , ("M-n", scratchSubmaps conf)
-                        , ("M-s", searchSubmaps extraConfig conf)
-                        , ("M-p", addName "Retrieve password" $ passPrompt def)
-                        , ("M-e", addName "Run app" $ runOrRaisePrompt def)
-                        , ("M-S-e", addName "Run shell command" $ shellPrompt def)] ^++^
-    subKeys "Windows" [ ("M-j", addName "Go down" $ windowGo D False)
-                      , ("M-k", addName "Go up" $ windowGo U False)
-                      , ("M-h", addName "Go left" $ windowGo L False)
-                      , ("M-l", addName "Go right" $ windowGo R False)
-                      -- Swap screen left or right, don't wrap
-                      , ("M-S-h", addName "Shift window up" $ screenSwap L True)
-                      , ("M-S-l", addName "Shift window right" $ screenSwap R True)
-                      -- , ("M-S-j", addName "Shift window down" $ windowSwap D False)
-                      -- , ("M-S-k", addName "Shift window up" $ windowSwap U False)
-                      -- , ("M-S-h", addName "Shift window left" $ windowSwap L False)
-                      -- , ("M-S-l", addName "Shift window right" $ windowSwap R False)
-                      , ("M-.", addName "Go to previous window" $ windows W.focusDown)
-                      , ("M-,", addName "Go to next window" $ windows W.focusUp)
-                      , ("M-S-m", addName "Swap master" $ windows W.swapMaster)
-                      ] ^++^
-    subKeys "Projects & Workspaces" (topicKeys' extraConfig conf) ^++^
-    subKeys "Layout management" [ ("M-C-<Space>", addName "Toggle layout" $ sendMessage ToggleLayout)
-                                , ("M-z", addName "Toggle zoom" $ sendMessage (Toggle "Zoom"))
-                                , ("M-<Space>", addName "Next layout" $ sendMessage NextLayout)] ^++^
-    subKeys "Resize" []
-  where
-    locker = "xset s activate"
 
 
 
@@ -228,7 +161,7 @@ masser extraConfig = xmonad =<< statusBar (bar extraConfig) zenburnPP toggleStru
     myConfig = withUrgencyHook dzenUrgencyHook { args = ["-bg", "darkgreen", "-xs", "1"]} $
                      withNavigation2DConfig myNav2d $
                      ewmh $
-                     addDescrKeys' ((mod4Mask, xK_F1), showKeybindings) (myKeys extraConfig) $
+                     addDescrKeys' ((mod4Mask, xK_F1), showKeybindings) (keybindings extraConfig) $
                      def {
                        modMask = mod4Mask -- Hyper
                        , terminal = urxvt . applications $ extraConfig

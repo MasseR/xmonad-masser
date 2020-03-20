@@ -1,6 +1,5 @@
 module XMonad.Configurable (Configurable, EndoM(..), configure) where
 
-import Control.Monad ((<=<))
 import Control.Monad.Reader
 
 newtype EndoM m a = EndoM { appEndoM :: a -> m a }

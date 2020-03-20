@@ -24,6 +24,7 @@ library
                     , XMonad.TopicUtils
                     , XMonad.TopicSpace
                     , XMonad.XMobar
+                    , XMonad.Config.MasseR.Bindings
   -- other-extensions:
   build-depends:       base >=4.11 && <4.14
                      , xmonad
