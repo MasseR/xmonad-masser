@@ -20,7 +20,7 @@ import XMonad
        , (=?)
        )
 import XMonad.Actions.Navigation2D
-       (Direction2D(..), screenSwap, windowGo)
+       (Direction2D(..), windowGo, windowSwap)
 import XMonad.Actions.Search
        (google, promptSearchBrowser, searchEngine)
 import XMonad.Layout
@@ -119,12 +119,13 @@ keybindings extraConfig conf =
                       , ("M-h", addName "Go left" $ windowGo L False)
                       , ("M-l", addName "Go right" $ windowGo R False)
                       -- Swap screen left or right, don't wrap
-                      , ("M-S-h", addName "Shift window up" $ screenSwap L True)
-                      , ("M-S-l", addName "Shift window right" $ screenSwap R True)
-                      -- , ("M-S-j", addName "Shift window down" $ windowSwap D False)
-                      -- , ("M-S-k", addName "Shift window up" $ windowSwap U False)
-                      -- , ("M-S-h", addName "Shift window left" $ windowSwap L False)
-                      -- , ("M-S-l", addName "Shift window right" $ windowSwap R False)
+                      -- , ("M-S-h", addName "Shift window up" $ screenSwap L True)
+                      -- , ("M-S-l", addName "Shift window right" $ screenSwap R True)
+                      -- I *was* using these mappings 🤦
+                      , ("M-S-j", addName "Shift window down" $ windowSwap D False)
+                      , ("M-S-k", addName "Shift window up" $ windowSwap U False)
+                      , ("M-S-h", addName "Shift window left" $ windowSwap L False)
+                      , ("M-S-l", addName "Shift window right" $ windowSwap R False)
                       , ("M-.", addName "Go to previous window" $ windows W.focusDown)
                       , ("M-,", addName "Go to next window" $ windows W.focusUp)
                       , ("M-S-m", addName "Swap master" $ windows W.swapMaster)
