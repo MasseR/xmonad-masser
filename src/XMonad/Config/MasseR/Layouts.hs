@@ -1,4 +1,5 @@
 {-# LANGUAGE PartialTypeSignatures #-}
+{-# OPTIONS_GHC -fno-warn-missing-signatures #-}
 module XMonad.Config.MasseR.Layouts (layout) where
 
 import XMonad
@@ -46,7 +47,7 @@ myTabConfig = def {
   }
 
 
-layout :: _
+-- No signature because it's humongous
 layout = smartBorders (toggleLayouts zoom workspaceLayouts)
   where
     zoom = renamed [Replace "Zoom"] (noBorders Full)
