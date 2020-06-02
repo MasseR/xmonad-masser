@@ -29,5 +29,7 @@ data Search = Search { name :: String
 data ExtraConfig =
   ExtraConfig { applications :: Applications
               , topics :: [ TopicRule ]
-              , searchEndpoints :: [Search] }
-                 deriving (Show, Generic)
+              , searchEndpoints :: [Search]
+              , todoInbox :: FilePath
+              }
+              deriving (Show, Generic)

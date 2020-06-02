@@ -26,11 +26,14 @@ library
                     , XMonad.XMobar
                     , XMonad.Config.MasseR.Bindings
                     , XMonad.Config.MasseR.Layouts
+                    , XMonad.Actions.OrgTodo
   -- other-extensions:
   build-depends:       base >=4.11 && <4.14
                      , xmonad
                      , xmonad-contrib
                      , mtl
+                     , time
+                     , data-default
                      , directory
                      , filepath
                      , unix
