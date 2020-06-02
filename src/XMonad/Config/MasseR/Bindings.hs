@@ -20,7 +20,7 @@ import XMonad
        , (=?)
        )
 import XMonad.Actions.OrgTodo
-       (inbox, addTodo)
+       (inbox, addTodo, xpconfig)
 import XMonad.Actions.Navigation2D
        (Direction2D(..), windowGo, windowSwap)
 import XMonad.Actions.Search
@@ -31,6 +31,7 @@ import XMonad.Layout.ToggleLayouts
        (ToggleLayout(..))
 import XMonad.Password
        (passPrompt)
+import XMonad.Prompt (XPConfig(..))
 import XMonad.Prompt.RunOrRaise
        (runOrRaisePrompt)
 import XMonad.Prompt.Shell
@@ -53,9 +54,12 @@ import XMonad.Util.NamedScratchpad
        (NamedScratchpad(..), namedScratchpadAction, nonFloating)
 
 import Control.Lens
-       ((^.), (.~))
+       ((^.), (.~), (&))
 import Data.Generics.Product
        (field)
+
+xpconf :: XPConfig
+xpconf = def{font="xft:Inconsolate-9"}
 
 scratchpads :: [NamedScratchpad]
 scratchpads = [
@@ -71,7 +75,7 @@ scratchSubmaps conf = submapName . mkNamedKeymap conf $ [
 -- Search engines inside submaps
 searchSubmaps :: ExtraConfig -> XConfig l -> NamedAction
 searchSubmaps extraConfig conf =
-    let mkBrowser = promptSearchBrowser def (extraConfig ^. field @"applications" . field @"browser")
+    let mkBrowser = promptSearchBrowser xpconf (extraConfig ^. field @"applications" . field @"browser")
         googleP = addName "Search google" $ mkBrowser google
         extras = [(key, addName name $ mkBrowser (searchEngine name url)) | Search{..} <- searchEndpoints extraConfig]
     in submapName . mkNamedKeymap conf $
@@ -88,7 +92,7 @@ projectKeys extraConfig conf = [ ("M-y", addName "Change topic" $ visualSelect (
                               , ("M-w", modifyWorkspaces)]
   where
     modifyWorkspaces =
-      submapName $ mkNamedKeymap conf [ ("a", addName "Add a new workspace" $ addWorkspacePrompt def)
+      submapName $ mkNamedKeymap conf [ ("a", addName "Add a new workspace" $ addWorkspacePrompt xpconf)
                                       , ("w", addName "Copy project" copyTopic)
                                       , ("d", addName "Remove empty workspace" removeEmptyWorkspace)]
 
@@ -113,9 +117,9 @@ keybindings extraConfig conf =
     subKeys "Launchers" [ ("M-S-<Return>", addName "Open terminal" $ spawn $ terminal conf)
                         , ("M-n", scratchSubmaps conf)
                         , ("M-s", searchSubmaps extraConfig conf)
-                        , ("M-p", addName "Retrieve password" $ passPrompt def)
-                        , ("M-e", addName "Run app" $ runOrRaisePrompt def)
-                        , ("M-S-e", addName "Run shell command" $ shellPrompt def)
+                        , ("M-p", addName "Retrieve password" $ passPrompt xpconf)
+                        , ("M-e", addName "Run app" $ runOrRaisePrompt xpconf)
+                        , ("M-S-e", addName "Run shell command" $ shellPrompt xpconf)
                         , ("M-t", addName "Add a todo" $ addTodo orgConfig)] ^++^
     subKeys "Windows" [ ("M-j", addName "Go down" $ windowGo D False)
                       , ("M-k", addName "Go up" $ windowGo U False)
@@ -140,4 +144,4 @@ keybindings extraConfig conf =
     subKeys "Resize" []
   where
     locker = "xset s activate"
-    orgConfig = inbox .~ (todoInbox extraConfig) $ def
+    orgConfig = def & inbox .~ todoInbox extraConfig & xpconfig .~ xpconf
