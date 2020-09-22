@@ -5,10 +5,15 @@ module XMonad.Config.MasseR.Bindings (keybindings) where
 
 import XMonad.Config.MasseR.ExtraConfig
 
+import Data.Tree
+       (Tree(Node))
+
 import XMonad
        ( KeyMask
        , KeySym
+       , X
        , XConfig
+       , className
        , def
        , kill
        , recompile
@@ -18,7 +23,6 @@ import XMonad
        , terminal
        , windows
        , (=?)
-       , className
        )
 import XMonad.Actions.Navigation2D
        (Direction2D(..), windowGo, windowSwap)
@@ -26,6 +30,8 @@ import XMonad.Actions.OrgTodo
        (addTodo, inbox, xpconfig)
 import XMonad.Actions.Search
        (google, promptSearchBrowser, searchEngine)
+import XMonad.Actions.TreeSelect
+       (TSNode(..), treeselectAction, tsDefaultConfig)
 import XMonad.Layout
        (ChangeLayout(..))
 import XMonad.Layout.ToggleLayouts
@@ -104,6 +110,11 @@ projectKeys extraConfig conf = [ ("M-y", addName "Change topic" $ visualSelect (
                                       , ("w", addName "Copy project" copyTopic)
                                       , ("d", addName "Remove empty workspace" removeEmptyWorkspace)]
 
+systemTree :: X ()
+systemTree = treeselectAction tsDefaultConfig
+  [ Node (TSNode "Sleep" "Suspend the machine" (spawn "systemctl suspend")) []
+  , Node (TSNode "Shutdown" "Shutdown system" (spawn "shutdown -h now")) []
+  ]
 
 keybindings :: ExtraConfig -> XConfig l -> [((KeyMask, KeySym), NamedAction)]
 keybindings extraConfig conf =
@@ -113,7 +124,7 @@ keybindings extraConfig conf =
     subKeys "System" [ ("<XF86Sleep>", addName "Suspend machine" $ spawn "sudo pm-suspend")
                      , ("<XF86AudioRaiseVolume>", addName "Increase volume" $ spawn "amixer set Master 2%+")
                      , ("<XF86AudioLowerVolume>", addName "Decrease volume" $ spawn "amixer set Master 2%-")
-                     , ("<XF86Favorites>", addName "Toggle microphone" $ spawn "pactl set-source-mute @DEFAULT_SOURCE@ toggle")
+                     , ("<XF86Favorites>", addName "System commands" systemTree)
                      , ("M-<plus>", addName "Increase volume" $ spawn "amixer set Master 2+")
                      , ("M-<minus>", addName "Decrease volume" $ spawn "amixer set Master 2-")
                      , ("<XF86AudioPlay>", addName "Play/pause music" $ spawn (musicToggle . applications $ extraConfig))
