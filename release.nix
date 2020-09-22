@@ -10,6 +10,7 @@ rec {
       ghcid
       cabal-install
       nixpkgs.pkgs.binutils
+      stylish-haskell
     ];
   };
 }
