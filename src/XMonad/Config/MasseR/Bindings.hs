@@ -65,7 +65,7 @@ xpconf = def{font="xft:Inconsolate-9"}
 
 scratchpads :: ExtraConfig -> [NamedScratchpad]
 scratchpads extraConf =
-  [ NS "notes" (extraConf ^. field @"applications" . field @"vim" <> " -g --role notes -c 'e ~/wikidata/index.md'") (wmRole =? "notes") nonFloating
+  [ NS "notes" (extraConf ^. field @"applications" . field @"vim" <> " -g --role notes -c 'e ~/wikidata/QuickNote.md'") (wmRole =? "notes") nonFloating
   , NS "music" "spotify" (className =? "Spotify") nonFloating
   ]
     where wmRole = stringProperty "WM_WINDOW_ROLE"
