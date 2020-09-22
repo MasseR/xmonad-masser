@@ -1,0 +1,13 @@
+name: "Test"
+on:
+  push:
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        channel: [19.03, 19.09, 20.03, 20.09]
+    steps:
+      - uses: actions/checkout@v1
+      - uses: cachix/install-nix-action@v11
+      - run: nix build -I nixpkgs=channel:nixos-${{ matrix.channel }} -f ./release.nix xmonad-masser
