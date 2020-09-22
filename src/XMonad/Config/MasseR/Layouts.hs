@@ -21,6 +21,8 @@ import XMonad.Layout.Master
        (mastered)
 import XMonad.Layout.NoBorders
        (noBorders, smartBorders)
+import XMonad.Layout.NoFrillsDecoration
+       (noFrillsDeco)
 import XMonad.Layout.PerWorkspace
        (onWorkspace)
 import XMonad.Layout.Renamed
@@ -30,25 +32,20 @@ import XMonad.Layout.Simplest
 import XMonad.Layout.Spiral
        (spiral)
 import XMonad.Layout.Tabbed
-       (TabbedDecoration, Theme(..), def, tabbed)
+       (TabbedDecoration, Theme(..), tabbed)
 import XMonad.Layout.ToggleLayouts
        (toggleLayouts)
 
+import XMonad.Config.MasseR.Theme
+       (defaultTheme, topBarTheme)
+
 -- Layout
 myTabConfig ::  Theme
-myTabConfig = def {
-      activeBorderColor = "#DCDCCC"
-    , activeTextColor = "#DCDCCC"
-    , activeColor = "#3F3F3F"
-    , fontName = "xft:Inconsolata-9"
-    , inactiveBorderColor = "#262626"
-    , inactiveTextColor = "#9FAFAF"
-    , inactiveColor = "#262626"
-  }
+myTabConfig = defaultTheme
 
 
 -- No signature because it's humongous
-layout = smartBorders (toggleLayouts zoom workspaceLayouts)
+layout = noFrillsDeco shrinkText topBarTheme (smartBorders (toggleLayouts zoom workspaceLayouts))
   where
     zoom = renamed [Replace "Zoom"] (noBorders Full)
     workspaceLayouts = onWorkspace "web" webLayout $

@@ -26,6 +26,7 @@ library
                     , XMonad.XMobar
                     , XMonad.Config.MasseR.Bindings
                     , XMonad.Config.MasseR.Layouts
+                    , XMonad.Config.MasseR.Theme
                     , XMonad.Actions.OrgTodo
   -- other-extensions:
   build-depends:       base >=4.11 && <4.14
