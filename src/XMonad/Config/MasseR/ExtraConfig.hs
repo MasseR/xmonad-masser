@@ -12,6 +12,7 @@ data Applications =
                , urxvt :: FilePath
                , musicToggle :: FilePath
                , vim :: FilePath
+               , spotify :: FilePath
                } deriving (Show, Generic)
 
 data TopicRule =

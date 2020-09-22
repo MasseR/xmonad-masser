@@ -65,10 +65,12 @@ xpconf = def{font="xft:Inconsolate-9"}
 
 scratchpads :: ExtraConfig -> [NamedScratchpad]
 scratchpads extraConf =
-  [ NS "notes" (extraConf ^. field @"applications" . field @"vim" <> " -g --role notes -c 'e ~/wikidata/QuickNote.md'") (wmRole =? "notes") nonFloating
-  , NS "music" "spotify" (className =? "Spotify") nonFloating
+  [ NS "notes" (vimPath <> " -g --role notes -c 'e ~/wikidata/QuickNote.md'") (wmRole =? "notes") nonFloating
+  , NS "music" spotifyPath (className =? "Spotify") nonFloating
   ]
     where wmRole = stringProperty "WM_WINDOW_ROLE"
+          vimPath = extraConf ^. field @"applications" . field @"vim"
+          spotifyPath = extraConf ^. field @"applications" . field @"spotify"
 
 scratchSubmaps :: ExtraConfig -> XConfig l -> NamedAction
 scratchSubmaps extraConf conf = submapName . mkNamedKeymap conf $
@@ -87,8 +89,8 @@ searchSubmaps extraConfig conf =
     in submapName . mkNamedKeymap conf $
             ("g", googleP) : extras
 
-spotify :: ExtraConfig -> XConfig l -> NamedAction
-spotify extraConf conf = submapName . mkNamedKeymap conf $
+spotifySubmap :: ExtraConfig -> XConfig l -> NamedAction
+spotifySubmap extraConf conf = submapName . mkNamedKeymap conf $
    [ ("M-p", addName "Play" $ spawn (musicToggle . applications $ extraConf)) ]
 
 projectKeys :: ExtraConfig -> XConfig l -> [(String, NamedAction)]
@@ -114,8 +116,8 @@ keybindings extraConfig conf =
                      , ("<XF86Favorites>", addName "Toggle microphone" $ spawn "pactl set-source-mute @DEFAULT_SOURCE@ toggle")
                      , ("M-<plus>", addName "Increase volume" $ spawn "amixer set Master 2+")
                      , ("M-<minus>", addName "Decrease volume" $ spawn "amixer set Master 2-")
-                     , ("<XF86AudioPlay>", addName "Play/pause music" $ spawn "mpc toggle")
-                     , ("M-m", spotify extraConfig conf)
+                     , ("<XF86AudioPlay>", addName "Play/pause music" $ spawn (musicToggle . applications $ extraConfig))
+                     , ("M-m", spotifySubmap extraConfig conf)
                      -- , ("M-S-<Space>", addName "Swap screens" swapNextScreen)
                      , ("M-<Backspace>", addName "Kill window" kill)
                      -- scrot requires `unGrab`
