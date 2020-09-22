@@ -18,11 +18,12 @@ import XMonad
        , terminal
        , windows
        , (=?)
+       , className
        )
-import XMonad.Actions.OrgTodo
-       (inbox, addTodo, xpconfig)
 import XMonad.Actions.Navigation2D
        (Direction2D(..), windowGo, windowSwap)
+import XMonad.Actions.OrgTodo
+       (addTodo, inbox, xpconfig)
 import XMonad.Actions.Search
        (google, promptSearchBrowser, searchEngine)
 import XMonad.Layout
@@ -31,7 +32,8 @@ import XMonad.Layout.ToggleLayouts
        (ToggleLayout(..))
 import XMonad.Password
        (passPrompt)
-import XMonad.Prompt (XPConfig(..))
+import XMonad.Prompt
+       (XPConfig(..))
 import XMonad.Prompt.RunOrRaise
        (runOrRaisePrompt)
 import XMonad.Prompt.Shell
@@ -54,7 +56,7 @@ import XMonad.Util.NamedScratchpad
        (NamedScratchpad(..), namedScratchpadAction, nonFloating)
 
 import Control.Lens
-       ((^.), (.~), (&))
+       ((&), (.~), (^.))
 import Data.Generics.Product
        (field)
 
@@ -62,15 +64,17 @@ xpconf :: XPConfig
 xpconf = def{font="xft:Inconsolate-9"}
 
 scratchpads :: [NamedScratchpad]
-scratchpads = [
-    NS "notes" "vim -g --role notes -c 'e ~/wikidata/index.md'" (wmRole =? "notes") nonFloating
-    ]
+scratchpads =
+  [ NS "notes" "vim -g --role notes -c 'e ~/wikidata/index.md'" (wmRole =? "notes") nonFloating
+  , NS "music" "spotify" (className =? "Spotify") nonFloating
+  ]
     where wmRole = stringProperty "WM_WINDOW_ROLE"
 
 scratchSubmaps :: XConfig l -> NamedAction
-scratchSubmaps conf = submapName . mkNamedKeymap conf $ [
-    ("M-n", addName "Open notes" $ namedScratchpadAction scratchpads "notes")
-    ]
+scratchSubmaps conf = submapName . mkNamedKeymap conf $
+  [ ("M-n", addName "Open notes" $ namedScratchpadAction scratchpads "notes")
+  , ("s", addName "Open Spotify" $ namedScratchpadAction scratchpads "music")
+  ]
 
 -- Search engines inside submaps
 searchSubmaps :: ExtraConfig -> XConfig l -> NamedAction
