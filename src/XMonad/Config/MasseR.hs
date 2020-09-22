@@ -33,6 +33,9 @@ import XMonad.Util.Run
 import XMonad.Config.MasseR.Bindings
 import XMonad.Config.MasseR.Layouts
 import XMonad.Config.MasseR.ExtraConfig
+import XMonad.Config.MasseR.Theme (defaultTheme)
+import XMonad.Layout.Decoration
+       (Theme(..))
 
 
 import qualified Data.Text as T
@@ -139,8 +142,8 @@ masser extraConfig = xmonad =<< statusBar (bar extraConfig) zenburnPP toggleStru
                        , clickJustFocuses = False
                        , startupHook = myStartupHook >> ewmhDesktopsStartup >> setWMName "LG3D"
                        , borderWidth = 2
-                       , normalBorderColor = "#262626"
-                       , focusedBorderColor = "#7F9F7F"
+                       , normalBorderColor = inactiveBorderColor defaultTheme
+                       , focusedBorderColor = activeBorderColor defaultTheme
                        , manageHook = myManageHook
                        -- The focus follows mouse is a bad idea for me because
                        -- it misbehaves with accordion. If I accidentally hover
