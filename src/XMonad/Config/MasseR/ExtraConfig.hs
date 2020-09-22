@@ -11,6 +11,7 @@ data Applications =
                , screenshot :: FilePath
                , urxvt :: FilePath
                , musicToggle :: FilePath
+               , vim :: FilePath
                } deriving (Show, Generic)
 
 data TopicRule =

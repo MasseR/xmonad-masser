@@ -63,18 +63,20 @@ import Data.Generics.Product
 xpconf :: XPConfig
 xpconf = def{font="xft:Inconsolate-9"}
 
-scratchpads :: [NamedScratchpad]
-scratchpads =
-  [ NS "notes" "vim -g --role notes -c 'e ~/wikidata/index.md'" (wmRole =? "notes") nonFloating
+scratchpads :: ExtraConfig -> [NamedScratchpad]
+scratchpads extraConf =
+  [ NS "notes" (extraConf ^. field @"applications" . field @"vim" <> " -g --role notes -c 'e ~/wikidata/index.md'") (wmRole =? "notes") nonFloating
   , NS "music" "spotify" (className =? "Spotify") nonFloating
   ]
     where wmRole = stringProperty "WM_WINDOW_ROLE"
 
-scratchSubmaps :: XConfig l -> NamedAction
-scratchSubmaps conf = submapName . mkNamedKeymap conf $
-  [ ("M-n", addName "Open notes" $ namedScratchpadAction scratchpads "notes")
-  , ("s", addName "Open Spotify" $ namedScratchpadAction scratchpads "music")
+scratchSubmaps :: ExtraConfig -> XConfig l -> NamedAction
+scratchSubmaps extraConf conf = submapName . mkNamedKeymap conf $
+  [ ("M-n", addName "Open notes" $ namedScratchpadAction scratch "notes")
+  , ("s", addName "Open Spotify" $ namedScratchpadAction scratch "music")
   ]
+  where
+    scratch = scratchpads extraConf
 
 -- Search engines inside submaps
 searchSubmaps :: ExtraConfig -> XConfig l -> NamedAction
@@ -119,7 +121,7 @@ keybindings extraConfig conf =
                      -- scrot requires `unGrab`
                      , ("M-<Print>", addName "Take screenshot" $ spawn (screenshot . applications $ extraConfig))] ^++^
     subKeys "Launchers" [ ("M-S-<Return>", addName "Open terminal" $ spawn $ terminal conf)
-                        , ("M-n", scratchSubmaps conf)
+                        , ("M-n", (scratchSubmaps extraConfig) conf)
                         , ("M-s", searchSubmaps extraConfig conf)
                         , ("M-p", addName "Retrieve password" $ passPrompt xpconf)
                         , ("M-e", addName "Run app" $ runOrRaisePrompt xpconf)
