@@ -9,8 +9,6 @@ import XMonad.Layout
        (Full(..), Mirror(..), Tall(..), (|||))
 import XMonad.Layout.Accordion
        (Accordion(..))
-import XMonad.Layout.BinarySpacePartition
-       (emptyBSP)
 import XMonad.Layout.Decoration
        (Decoration, DefaultShrinker)
 import XMonad.Layout.DwmStyle
@@ -55,12 +53,11 @@ layout = noFrillsDeco shrinkText topBarTheme (smartBorders (toggleLayouts zoom w
                        onWorkspace "mail" mailLayout
                        defLayout
     -- Default layout
-    defLayout = tiled ||| tabLayout ||| readLayout ||| bspLayout ||| vimLayout ||| spiral (6/7) ||| Full
+    defLayout = tiled ||| tabLayout ||| readLayout ||| vimLayout ||| spiral (6/7) ||| Full
     -- Pdfs are restricted to tabs
     vimLayout = Mirror (mastered (1/100) (4/5) Accordion)
     pdfLayout =  readLayout ||| tiled ||| tabLayout
     readLayout = renamed [Replace "2/3"] (dwmStyle shrinkText myTabConfig (mastered (1/100) (2/3) Accordion))
-    bspLayout = renamed [Replace "master bsp"] (dwmStyle shrinkText myTabConfig (mastered (1/100) (2/3) (Mirror emptyBSP)))
     -- Documents are by default tabs, but have looser restrictions
     documentLayout = tabLayout ||| Full ||| tiled ||| Mirror tiled
     -- Web is either tabbed, full, or tiled
