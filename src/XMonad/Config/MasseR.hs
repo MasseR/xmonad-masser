@@ -68,8 +68,7 @@ q =~? x = fmap (x `List.isInfixOf`) q
 -- Move programs to their workspaces
 myManageHook :: XMonad.Query (Endo WindowSet)
 myManageHook = mconcat
-  [ dynamicsHook
-  , webHooks
+  [ webHooks
   , pdfHooks
   , documentHooks
   , floatHooks
@@ -113,7 +112,6 @@ myManageHook = mconcat
           "JSwat Debugger", -- Haven't used this in years. A good thing?
           "DBeaver"
       ]
-    dynamicsHook = titleHook (doShift "dynamics") ["Dynamics"]
     flowHook = titleHook (doShift "flowdock") ["www.flowdock.com"]
 
 
