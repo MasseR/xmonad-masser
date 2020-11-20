@@ -9,6 +9,7 @@ import XMonad.Hooks.EwmhDesktops
        (ewmh, ewmhDesktopsStartup)
 import XMonad.Hooks.SetWMName
        (setWMName)
+import XMonad.Hooks.ManageHelpers (doCenterFloat)
 import XMonad.Hooks.UrgencyHook
        (args, dzenUrgencyHook, withUrgencyHook)
 
@@ -74,6 +75,7 @@ myManageHook = mconcat
   , floatHooks
   , debuggerHooks
   , flowHook
+  , pipHooks
   ]
   where
     classHook y = foldMap (\x -> className =? x --> y)
@@ -102,6 +104,8 @@ myManageHook = mconcat
         , "Xmessage"
         , "mpv"
       ]
+    -- The new picture in picture mode in firefox
+    pipHooks = titleHook doCenterFloat [ "Picture-in-Picture" ]
     debuggerHooks = classHook (doShift "debugger") [
           "DBeaver"
       ]
