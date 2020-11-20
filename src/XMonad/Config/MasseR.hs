@@ -109,7 +109,6 @@ myManageHook = mconcat
         , "mpv"
       ]
     debuggerHooks = classHook (doShift "debugger") [
-          "JSwat Debugger", -- Haven't used this in years. A good thing?
           "DBeaver"
       ]
     flowHook = titleHook (doShift "flowdock") ["www.flowdock.com"]
