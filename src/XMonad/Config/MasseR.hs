@@ -3,7 +3,6 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 module XMonad.Config.MasseR  where
 
-
 import qualified Data.List as List
 import XMonad
 import XMonad.Hooks.EwmhDesktops
@@ -68,17 +67,18 @@ q =~? x = fmap (x `List.isInfixOf`) q
 -- Manage hooks
 -- Move programs to their workspaces
 myManageHook :: XMonad.Query (Endo WindowSet)
-myManageHook = composeAll $ concat [
-      dynamicsHook
-    , webHooks
-    , pdfHooks
-    , documentHooks
-    , floatHooks
-    , debuggerHooks
-    , flowHook
+myManageHook = mconcat
+  [ dynamicsHook
+  , webHooks
+  , pdfHooks
+  , documentHooks
+  , floatHooks
+  , debuggerHooks
+  , flowHook
   ]
   where
-    classHook y = map (\x -> className =? x --> y)
+    classHook y = foldMap (\x -> className =? x --> y)
+    titleHook y = foldMap (\x -> title =? x --> y)
     webHooks = classHook (doShift "web") [
           "Firefox"
         , "qutebrowser"
@@ -113,8 +113,8 @@ myManageHook = composeAll $ concat [
           "JSwat Debugger", -- Haven't used this in years. A good thing?
           "DBeaver"
       ]
-    dynamicsHook = [title =~? "Dynamics" --> doShift "dynamics"]
-    flowHook = [title =~? "www.flowdock.com" --> doShift "flowdock"]
+    dynamicsHook = titleHook (doShift "dynamics") ["Dynamics"]
+    flowHook = titleHook (doShift "flowdock") ["www.flowdock.com"]
 
 
 
