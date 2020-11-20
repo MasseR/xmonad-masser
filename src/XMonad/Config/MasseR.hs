@@ -96,16 +96,10 @@ myManageHook = mconcat
     documentHooks = classHook (doShift "documents") [
           "libreoffice"
         , "libreoffice-calc"
-        , "Assistant"
-        , "Bouml" -- Oh wow, didn't even remember this existed
       ]
     floatHooks = classHook doFloat [
-          "SMplayer"
-        , "Gimp"
-        , "MPlayer"
-        , "Kaffeine"
+          "Gimp"
         , "Xmessage"
-        , "Wfica_Seamless" -- I think this is citrix
         , "mpv"
       ]
     debuggerHooks = classHook (doShift "debugger") [
