@@ -3,13 +3,13 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 module XMonad.Config.MasseR  where
 
-
 import qualified Data.List as List
 import XMonad
 import XMonad.Hooks.EwmhDesktops
        (ewmh, ewmhDesktopsStartup)
 import XMonad.Hooks.SetWMName
        (setWMName)
+import XMonad.Hooks.ManageHelpers (doCenterFloat)
 import XMonad.Hooks.UrgencyHook
        (args, dzenUrgencyHook, withUrgencyHook)
 
@@ -68,17 +68,18 @@ q =~? x = fmap (x `List.isInfixOf`) q
 -- Manage hooks
 -- Move programs to their workspaces
 myManageHook :: XMonad.Query (Endo WindowSet)
-myManageHook = composeAll $ concat [
-      dynamicsHook
-    , webHooks
-    , pdfHooks
-    , documentHooks
-    , floatHooks
-    , debuggerHooks
-    , flowHook
+myManageHook = mconcat
+  [ webHooks
+  , pdfHooks
+  , documentHooks
+  , floatHooks
+  , debuggerHooks
+  , flowHook
+  , pipHooks
   ]
   where
-    classHook y = map (\x -> className =? x --> y)
+    classHook y = foldMap (\x -> className =? x --> y)
+    titleHook y = foldMap (\x -> title =? x --> y)
     webHooks = classHook (doShift "web") [
           "Firefox"
         , "qutebrowser"
@@ -97,24 +98,18 @@ myManageHook = composeAll $ concat [
     documentHooks = classHook (doShift "documents") [
           "libreoffice"
         , "libreoffice-calc"
-        , "Assistant"
-        , "Bouml" -- Oh wow, didn't even remember this existed
       ]
     floatHooks = classHook doFloat [
-          "SMplayer"
-        , "Gimp"
-        , "MPlayer"
-        , "Kaffeine"
+          "Gimp"
         , "Xmessage"
-        , "Wfica_Seamless" -- I think this is citrix
         , "mpv"
       ]
+    -- The new picture in picture mode in firefox
+    pipHooks = titleHook doCenterFloat [ "Picture-in-Picture" ]
     debuggerHooks = classHook (doShift "debugger") [
-          "JSwat Debugger", -- Haven't used this in years. A good thing?
           "DBeaver"
       ]
-    dynamicsHook = [title =~? "Dynamics" --> doShift "dynamics"]
-    flowHook = [title =~? "www.flowdock.com" --> doShift "flowdock"]
+    flowHook = titleHook (doShift "flowdock") ["www.flowdock.com"]
 
 
 
