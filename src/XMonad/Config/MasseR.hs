@@ -119,9 +119,6 @@ myManageHook = composeAll $ concat [
 
 
 
-myStartupHook :: X ()
-myStartupHook = spawnOnce "$HOME/wminit"
-
 masser :: ExtraConfig -> IO ()
 masser extraConfig = xmonad =<< statusBar (bar extraConfig) zenburnPP toggleStrutsKey myConfig
   where
@@ -140,7 +137,7 @@ masser extraConfig = xmonad =<< statusBar (bar extraConfig) zenburnPP toggleStru
                                       in S.toList (S.fromList defaults <> S.fromList external)
                        , layoutHook = layout
                        , clickJustFocuses = False
-                       , startupHook = myStartupHook >> ewmhDesktopsStartup >> setWMName "LG3D"
+                       , startupHook = ewmhDesktopsStartup >> setWMName "LG3D"
                        , borderWidth = 2
                        , normalBorderColor = inactiveBorderColor defaultTheme
                        , focusedBorderColor = activeBorderColor defaultTheme
