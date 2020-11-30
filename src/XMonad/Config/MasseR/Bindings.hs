@@ -26,8 +26,6 @@ import XMonad
        )
 import XMonad.Actions.Navigation2D
        (Direction2D(..), windowGo, windowSwap)
-import XMonad.Actions.OrgTodo
-       (addTodo, inbox, xpconfig)
 import XMonad.Actions.Search
        (google, promptSearchBrowser, searchEngine)
 import XMonad.Actions.TreeSelect
@@ -62,7 +60,7 @@ import XMonad.Util.NamedScratchpad
        (NamedScratchpad(..), namedScratchpadAction, nonFloating)
 
 import Control.Lens
-       ((&), (.~), (^.))
+       ((^.))
 import Data.Generics.Product
        (field)
 
@@ -139,7 +137,7 @@ keybindings extraConfig conf =
                         , ("M-p", addName "Retrieve password" $ passPrompt xpconf)
                         , ("M-e", addName "Run app" $ runOrRaisePrompt xpconf)
                         , ("M-S-e", addName "Run shell command" $ shellPrompt xpconf)
-                        , ("M-t", addName "Add a todo" $ addTodo orgConfig)] ^++^
+                        ] ^++^
     subKeys "Windows" [ ("M-j", addName "Go down" $ windowGo D False)
                       , ("M-k", addName "Go up" $ windowGo U False)
                       , ("M-h", addName "Go left" $ windowGo L False)
@@ -163,4 +161,3 @@ keybindings extraConfig conf =
     subKeys "Resize" []
   where
     locker = "xset s activate"
-    orgConfig = def & inbox .~ todoInbox extraConfig & xpconfig .~ xpconf

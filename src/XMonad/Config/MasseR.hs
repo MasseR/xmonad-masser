@@ -19,8 +19,6 @@ import XMonad.XMobar
 import Data.Monoid
        (Endo)
 
-import XMonad.Util.SpawnOnce
-
 import System.IO
        (hClose, hPutStr)
 import XMonad.Actions.Navigation2D
