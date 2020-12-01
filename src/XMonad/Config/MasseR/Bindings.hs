@@ -93,6 +93,22 @@ searchSubmaps extraConfig conf =
     in submapName . mkNamedKeymap conf $
             ("g", googleP) : extras
 
+-- Pomodoro stuff
+pomodoroSubmaps :: ExtraConfig -> XConfig l -> NamedAction
+pomodoroSubmaps extraConfig conf =
+  submapName  . mkNamedKeymap conf $
+    [ ("M-å", addName "start auto" $ spawn startAuto )
+    , ("s", addName "pause" $ spawn stop)
+    ]
+  where
+    startAuto = extraConfig ^. field @"applications" . field @"pomodoroStart"
+    stop = extraConfig ^. field @"applications" . field @"pomodoroStop"
+    -- let mkBrowser = promptSearchBrowser xpconf (extraConfig ^. field @"applications" . field @"browser")
+    --     googleP = addName "Search google" $ mkBrowser google
+    --     extras = [(key, addName name $ mkBrowser (searchEngine name url)) | Search{..} <- searchEndpoints extraConfig]
+    -- in submapName . mkNamedKeymap conf $
+    --         ("g", googleP) : extras
+
 spotifySubmap :: ExtraConfig -> XConfig l -> NamedAction
 spotifySubmap extraConf conf = submapName . mkNamedKeymap conf $
    [ ("M-p", addName "Play" $ spawn (musicToggle . applications $ extraConf)) ]
@@ -134,6 +150,7 @@ keybindings extraConfig conf =
     subKeys "Launchers" [ ("M-S-<Return>", addName "Open terminal" $ spawn $ terminal conf)
                         , ("M-n", (scratchSubmaps extraConfig) conf)
                         , ("M-s", searchSubmaps extraConfig conf)
+                        , ("M-å", pomodoroSubmaps extraConfig conf)
                         , ("M-p", addName "Retrieve password" $ passPrompt xpconf)
                         , ("M-e", addName "Run app" $ runOrRaisePrompt xpconf)
                         , ("M-S-e", addName "Run shell command" $ shellPrompt xpconf)

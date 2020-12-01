@@ -13,6 +13,8 @@ data Applications =
                , musicToggle :: FilePath
                , vim :: FilePath
                , spotify :: FilePath
+               , pomodoroStart :: FilePath
+               , pomodoroStop :: FilePath
                } deriving (Show, Generic)
 
 data TopicRule =
