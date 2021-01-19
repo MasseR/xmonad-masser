@@ -5,6 +5,9 @@ module XMonad.Config.MasseR.Bindings (keybindings) where
 
 import XMonad.Config.MasseR.ExtraConfig
 
+import Data.Maybe
+       (catMaybes)
+
 import Data.Tree
        (Tree(Node))
 
@@ -60,21 +63,19 @@ import XMonad.Util.NamedScratchpad
        (NamedScratchpad(..), namedScratchpadAction, nonFloating)
 
 import Control.Lens
-       ((^.))
-import Data.Generics.Product
-       (field)
+       (ix, (^.), (^?))
 
 xpconf :: XPConfig
 xpconf = def{font="xft:Inconsolate-9"}
 
 scratchpads :: ExtraConfig -> [NamedScratchpad]
-scratchpads extraConf =
-  [ NS "notes" (vimPath <> " -g --role notes -c 'e ~/wikidata/QuickNote.md'") (wmRole =? "notes") nonFloating
-  , NS "music" spotifyPath (className =? "Spotify") nonFloating
+scratchpads extraConf = catMaybes
+  [ NS "notes" <$> vim <*> pure (wmRole =? "notes") <*> pure nonFloating
+  , NS "music" <$> spotify <*> pure (className =? "Spotify") <*> pure nonFloating
   ]
     where wmRole = stringProperty "WM_WINDOW_ROLE"
-          vimPath = extraConf ^. field @"applications" . field @"vim"
-          spotifyPath = extraConf ^. field @"applications" . field @"spotify"
+          vim = fmap (\path -> path <> " -g --role notes -c 'e ~/wikidata/QuickNote.md'") $ extraConf ^? applications . ix "vim" . action
+          spotify = extraConf ^? applications . ix "spotify" . action
 
 scratchSubmaps :: ExtraConfig -> XConfig l -> NamedAction
 scratchSubmaps extraConf conf = submapName . mkNamedKeymap conf $
@@ -87,11 +88,12 @@ scratchSubmaps extraConf conf = submapName . mkNamedKeymap conf $
 -- Search engines inside submaps
 searchSubmaps :: ExtraConfig -> XConfig l -> NamedAction
 searchSubmaps extraConfig conf =
-    let mkBrowser = promptSearchBrowser xpconf (extraConfig ^. field @"applications" . field @"browser")
-        googleP = addName "Search google" $ mkBrowser google
-        extras = [(key, addName name $ mkBrowser (searchEngine name url)) | Search{..} <- searchEndpoints extraConfig]
+    let extras = [(_searchKey, addName _searchName $ mkBrowser (searchEngine _searchName _searchUrl)) | Search{..} <- extraConfig ^. searchEndpoints]
     in submapName . mkNamedKeymap conf $
-            ("g", googleP) : extras
+            ("g", googleNA) : extras
+  where
+    mkBrowser = promptSearchBrowser xpconf (application extraConfig "browser")
+    googleNA = addName "Search google" $ mkBrowser google
 
 -- Pomodoro stuff
 pomodoroSubmaps :: ExtraConfig -> XConfig l -> NamedAction
@@ -101,8 +103,8 @@ pomodoroSubmaps extraConfig conf =
     , ("s", addName "pause" $ spawn stop)
     ]
   where
-    startAuto = extraConfig ^. field @"applications" . field @"pomodoroStart"
-    stop = extraConfig ^. field @"applications" . field @"pomodoroStop"
+    startAuto = application extraConfig "pomodoroStart"
+    stop = application extraConfig "pomodoroStop"
     -- let mkBrowser = promptSearchBrowser xpconf (extraConfig ^. field @"applications" . field @"browser")
     --     googleP = addName "Search google" $ mkBrowser google
     --     extras = [(key, addName name $ mkBrowser (searchEngine name url)) | Search{..} <- searchEndpoints extraConfig]
@@ -111,7 +113,7 @@ pomodoroSubmaps extraConfig conf =
 
 spotifySubmap :: ExtraConfig -> XConfig l -> NamedAction
 spotifySubmap extraConf conf = submapName . mkNamedKeymap conf $
-   [ ("M-p", addName "Play" $ spawn (musicToggle . applications $ extraConf)) ]
+   [ ("M-p", addName "Play" $ spawn (application extraConf "musicToggle")) ]
 
 projectKeys :: ExtraConfig -> XConfig l -> [(String, NamedAction)]
 projectKeys extraConfig conf = [ ("M-y", addName "Change topic" $ visualSelect (topicConfig extraConfig))
@@ -141,12 +143,12 @@ keybindings extraConfig conf =
                      , ("<XF86Favorites>", addName "System commands" systemTree)
                      , ("M-<plus>", addName "Increase volume" $ spawn "amixer set Master 2+")
                      , ("M-<minus>", addName "Decrease volume" $ spawn "amixer set Master 2-")
-                     , ("<XF86AudioPlay>", addName "Play/pause music" $ spawn (musicToggle . applications $ extraConfig))
+                     , ("<XF86AudioPlay>", addName "Play/pause music" $ spawn (application extraConfig "musicToggle"))
                      , ("M-m", spotifySubmap extraConfig conf)
                      -- , ("M-S-<Space>", addName "Swap screens" swapNextScreen)
                      , ("M-<Backspace>", addName "Kill window" kill)
                      -- scrot requires `unGrab`
-                     , ("M-<Print>", addName "Take screenshot" $ spawn (screenshot . applications $ extraConfig))] ^++^
+                     , ("M-<Print>", addName "Take screenshot" $ spawn (application extraConfig "screenshot"))] ^++^
     subKeys "Launchers" [ ("M-S-<Return>", addName "Open terminal" $ spawn $ terminal conf)
                         , ("M-n", (scratchSubmaps extraConfig) conf)
                         , ("M-s", searchSubmaps extraConfig conf)

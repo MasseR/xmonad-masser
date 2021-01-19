@@ -1,15 +1,27 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
 module XMonad.Config.MasseR  where
+
+import Control.Exception
+       (SomeException, catch)
+
+import Control.Lens
+import Data.Text.Strict.Lens
+       (packed, unpacked)
+
+import Paths_xmonad_masser
+       (getDataFileName)
 
 import qualified Data.List as List
 import XMonad
 import XMonad.Hooks.EwmhDesktops
        (ewmh, ewmhDesktopsStartup)
+import XMonad.Hooks.ManageHelpers
+       (doCenterFloat)
 import XMonad.Hooks.SetWMName
        (setWMName)
-import XMonad.Hooks.ManageHelpers (doCenterFloat)
 import XMonad.Hooks.UrgencyHook
        (args, dzenUrgencyHook, withUrgencyHook)
 
@@ -29,19 +41,20 @@ import XMonad.Util.Run
        (spawnPipe)
 
 import XMonad.Config.MasseR.Bindings
-import XMonad.Config.MasseR.Layouts
 import XMonad.Config.MasseR.ExtraConfig
-import XMonad.Config.MasseR.Theme (defaultTheme)
+import XMonad.Config.MasseR.Layouts
+import XMonad.Config.MasseR.Theme
+       (defaultTheme)
 import XMonad.Layout.Decoration
        (Theme(..))
 
-
-import qualified Data.Text as T
 
 import XMonad.Hooks.DynamicLog
        (statusBar)
 
 import qualified Data.Set as S
+
+import Dhall
 
 
 
@@ -111,22 +124,30 @@ myManageHook = mconcat
 
 
 
+defaultMain :: FilePath -> IO ()
+defaultMain confPath = do
+  converterPath <- getDataFileName "dhall/ConfigToExtraConfig.dhall"
+  print (converterPath ^. packed <> " ./test.dhall")
+  c <- catch @SomeException (input auto (converterPath ^. packed <> " " <> confPath ^. packed)) (\e -> mempty <$ err e)
+  masser c
+  where
+    err e = spawn ("xmessage -- " <> show e)
 
 masser :: ExtraConfig -> IO ()
-masser extraConfig = xmonad =<< statusBar (bar extraConfig) zenburnPP toggleStrutsKey myConfig
+masser extraConfig = xmonad =<< statusBar bar zenburnPP toggleStrutsKey myConfig
   where
     toggleStrutsKey XConfig{modMask=modm} = (modm, xK_b)
-    bar = prompt . applications
+    bar = application extraConfig "prompt"
     myConfig = withUrgencyHook dzenUrgencyHook { args = ["-bg", "darkgreen", "-xs", "1"]} $
                      withNavigation2DConfig myNav2d $
                      ewmh $
                      addDescrKeys' ((mod4Mask, xK_F1), showKeybindings) (keybindings extraConfig) $
                      def {
                        modMask = mod4Mask -- Hyper
-                       , terminal = urxvt . applications $ extraConfig
+                       , terminal = application extraConfig "urxvt"
                        , keys = const mempty
                        , workspaces = let defaults = ["irc", "web", "mail"]
-                                          external = map (T.unpack . topicName) . topics $ extraConfig
+                                          external = extraConfig ^.. topics . folded . name . unpacked
                                       in S.toList (S.fromList defaults <> S.fromList external)
                        , layoutHook = layout
                        , clickJustFocuses = False
