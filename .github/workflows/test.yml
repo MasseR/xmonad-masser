@@ -10,4 +10,4 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - uses: cachix/install-nix-action@v12
-      - run: nix build -I nixpkgs=channel:nixos-${{ matrix.channel }} -f ./release.nix xmonad-masser
+      - run: nix-build -I nixpkgs=channel:nixos-${{ matrix.channel }} -E '(import <nixpkgs> {}).haskellPackages.callPackage ./. {}'
