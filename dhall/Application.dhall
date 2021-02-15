@@ -1,3 +1,6 @@
-{ name : Text
-, action : Text
+{ Type =
+  { name : Text
+  , action : Text
+  }
+, default = {=}
 }

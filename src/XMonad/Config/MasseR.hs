@@ -78,8 +78,8 @@ q =~? x = fmap (x `List.isInfixOf`) q
 
 -- Manage hooks
 -- Move programs to their workspaces
-myManageHook :: XMonad.Query (Endo WindowSet)
-myManageHook = mconcat
+myManageHook :: [TopicRule] -> XMonad.Query (Endo WindowSet)
+myManageHook rules = mconcat
   [ webHooks
   , pdfHooks
   , documentHooks
@@ -87,10 +87,13 @@ myManageHook = mconcat
   , debuggerHooks
   , flowHook
   , pipHooks
+  , extraHooks
   ]
   where
     classHook y = foldMap (\x -> className =? x --> y)
     titleHook y = foldMap (\x -> title =? x --> y)
+    extraHooks :: Query (Endo WindowSet)
+    extraHooks = foldMap (\r -> classHook (doShift (r ^. name . unpacked)) (r ^.. classes . traversed . unpacked)) rules
     webHooks = classHook (doShift "web") [
           "Firefox"
         , "qutebrowser"
@@ -155,7 +158,7 @@ masser extraConfig = xmonad =<< statusBar bar zenburnPP toggleStrutsKey myConfig
                        , borderWidth = 2
                        , normalBorderColor = inactiveBorderColor defaultTheme
                        , focusedBorderColor = activeBorderColor defaultTheme
-                       , manageHook = myManageHook
+                       , manageHook = myManageHook (extraConfig ^. topics)
                        -- The focus follows mouse is a bad idea for me because
                        -- it misbehaves with accordion. If I accidentally hover
                        -- my mouse at the lower edge of the accordion, it will

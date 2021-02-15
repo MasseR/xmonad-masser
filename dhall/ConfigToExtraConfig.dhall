@@ -1,4 +1,5 @@
-let Config = ./Config.dhall
-let convert : Config -> ./ExtraConfig.dhall =
-  \(config : Config) -> config with applications = ./ApplicationToMap.dhall config.applications
+let Config = ./package.dhall
+let ExtraConfig = ./ExtraConfig.dhall
+let convert : Config.Type -> ExtraConfig.Type =
+  \(config : Config.Type) -> config with applications = ./ApplicationToMap.dhall config.applications
 in convert

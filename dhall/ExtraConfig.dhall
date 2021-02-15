@@ -1,5 +1,12 @@
-{ searchEndpoints : List ./Search.dhall
-, topics : List ./TopicRule.dhall
-, applications : List { mapKey : Text, mapValue : ./Application.dhall }
+let Config = ./package.dhall
+in
+{ Type =
+  { searchEndpoints : List Config.Search.Type
+  , topics : List Config.TopicRule.Type
+  , applications : List { mapKey : Text, mapValue : Config.Application.Type }
+  }
+, default =
+  { searchEndpoints = [] : List Config.Search.Type
+  , topics = [] : List Config.TopicRule.Type
+  }
 }
-

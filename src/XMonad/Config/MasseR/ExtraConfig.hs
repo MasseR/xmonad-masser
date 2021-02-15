@@ -35,6 +35,7 @@ data TopicRule =
   TopicRule { _topicRuleName :: Text
             , _topicRuleHome :: Maybe Text
             , _topicRuleAction :: Maybe Text
+            , _topicRuleClasses :: [Text]
             }
   deriving stock (Show, Generic)
   deriving (FromDhall, ToDhall) via Codec (Field (CamelCase <<< DropPrefix "_topicRule")) TopicRule

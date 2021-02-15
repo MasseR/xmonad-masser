@@ -15,6 +15,7 @@ maintainer:          mats.rauhala@iki.fi
 build-type:          Simple
 data-files:          dhall/*.dhall
 extra-source-files:  ChangeLog.md
+                     dhall/*.dhall
 
 library
   exposed-modules:    XMonad.Config.MasseR

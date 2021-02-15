@@ -44,8 +44,8 @@ addTopic t = EndoM $ \super -> let
 
 topicConfig :: ExtraConfig -> TopicConfig
 topicConfig extraConfig =
-  let dirs = M.fromList [ (T.unpack n, T.unpack d) | TopicRule n (Just d) _ <- extraConfig ^. topics ]
-      actions = M.fromList [ (T.unpack n, spawn (T.unpack a)) | TopicRule n _ (Just a) <- extraConfig ^. topics ]
+  let dirs = M.fromList [ (T.unpack n, T.unpack d) | TopicRule{_topicRuleName=n,_topicRuleHome=Just d} <- extraConfig ^. topics ]
+      actions = M.fromList [ (T.unpack n, spawn (T.unpack a)) | TopicRule{_topicRuleName=n,_topicRuleAction=Just a} <- extraConfig ^. topics ]
   in def {
     topicDirs = dirs
   , defaultTopicAction = const (realTopicDir dirs >>= spawnShellIn)

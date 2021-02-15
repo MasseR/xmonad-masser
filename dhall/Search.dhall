@@ -1,5 +1,8 @@
-{ name : Text
-, key : Text
-, url : Text
+{ Type =
+  { name : Text
+  , key : Text
+  , url : Text
+  }
+, default = {=}
 }
 
