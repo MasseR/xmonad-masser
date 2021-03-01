@@ -164,5 +164,4 @@ masser extraConfig = xmonad =<< statusBar bar zenburnPP toggleStrutsKey myConfig
                        -- my mouse at the lower edge of the accordion, it will
                        -- just cycle through to the last accordion
                        , focusFollowsMouse = False
-                       , logHook = updatePointer (0.25, 0.25) (0.25, 0.25)
                      }
