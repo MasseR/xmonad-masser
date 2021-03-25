@@ -1,7 +1,7 @@
 { nixpkgs ? import <nixpkgs> {} }:
 
 rec {
-  xmonad-masser = nixpkgs.callPackage ./default.nix {};
+  xmonad-masser = nixpkgs.haskellPackages.callPackage ./default.nix {};
   shell = nixpkgs.buildEnv {
     name = "shell";
     paths = [];
