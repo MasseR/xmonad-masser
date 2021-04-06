@@ -129,6 +129,7 @@ projectKeys extraConfig conf = [ ("M-y", addName "Change topic" $ visualSelect (
 systemTree :: X ()
 systemTree = treeselectAction tsDefaultConfig
   [ Node (TSNode "Sleep" "Suspend the machine" (spawn "systemctl suspend")) []
+  , Node (TSNode "Hibernate" "Hibernate the machine" (spawn "systemctl hibernate")) []
   , Node (TSNode "Shutdown" "Shutdown system" (spawn "shutdown -h now")) []
   ]
 
