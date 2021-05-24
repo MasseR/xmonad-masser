@@ -13,9 +13,7 @@ maintainer:          mats.rauhala@iki.fi
 -- copyright:
 -- category:
 build-type:          Simple
-data-files:          dhall/*.dhall
 extra-source-files:  ChangeLog.md
-                     dhall/*.dhall
 
 library
   exposed-modules:    XMonad.Config.MasseR
@@ -46,6 +44,5 @@ library
                      , text
                      , lens
                      , generic-lens
-                     , dhall
   hs-source-dirs:      src
   default-language:    Haskell2010

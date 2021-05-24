@@ -54,8 +54,6 @@ import XMonad.Hooks.DynamicLog
 
 import qualified Data.Set as S
 
-import Dhall
-
 
 
 
@@ -126,15 +124,6 @@ myManageHook rules = mconcat
     flowHook = titleHook (doShift "flowdock") ["www.flowdock.com"]
 
 
-
-defaultMain :: FilePath -> IO ()
-defaultMain confPath = do
-  converterPath <- getDataFileName "dhall/ConfigToExtraConfig.dhall"
-  print (converterPath ^. packed <> " ./test.dhall")
-  c <- catch @SomeException (input auto (converterPath ^. packed <> " " <> confPath ^. packed)) (\e -> mempty <$ err e)
-  masser c
-  where
-    err e = spawn ("xmessage -- " <> show e)
 
 masser :: ExtraConfig -> IO ()
 masser extraConfig = xmonad =<< statusBar bar zenburnPP toggleStrutsKey myConfig

@@ -2,18 +2,29 @@
 
 with nixpkgs;
 
-let pkg = haskellPackages.callPackage ./. {};
+let
+  hp = haskellPackages.extend (self: super: {
+    xmonad-masser = self.callPackage ./. {};
+  });
+  easy-hls-src = fetchFromGitHub {
+    owner = "jkachmar";
+    repo = "easy-hls-nix";
+    inherit (builtins.fromJSON (builtins.readFile ./easy-hls-nix.json)) rev sha256;
+  };
+  easy-hls = callPackage easy-hls-src { ghcVersions = [ hp.ghc.version ]; };
 
 in
 
-mkShell {
-
+hp.shellFor {
+  packages = h: [h.xmonad-masser];
+  withHoogle = true;
   buildInputs = [
-    ghcid
-    hlint
+    entr
+    cabal-install
+    hp.hlint
     stylish-haskell
-    haskellPackages.cabal-install
+    ghcid
     cabal2nix
-    (haskellPackages.ghcWithPackages (_: pkg.buildInputs ++ pkg.propagatedBuildInputs))
+    easy-hls
   ];
 }

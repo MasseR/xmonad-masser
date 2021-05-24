@@ -11,23 +11,22 @@ module XMonad.Config.MasseR.ExtraConfig where
 import Data.Maybe
        (fromMaybe)
 
-import Control.Lens
+import Control.Lens ( (^?), (^.), makeFields, Ixed(ix) )
 import Data.Text.Strict.Lens
        (unpacked)
 
-import Dhall
-import Dhall.Deriving
 
 import Data.Map
        (Map)
 import qualified Data.Map.Strict as M
+import Data.Text (Text)
+import GHC.Generics ( Generic )
 
 data Application
   = Application { _applicationName :: Text
                 , _applicationAction :: FilePath
                 }
   deriving stock (Show, Generic)
-  deriving (FromDhall, ToDhall) via Codec (Field (CamelCase <<< DropPrefix "_application")) Application
 
 makeFields ''Application
 
@@ -38,7 +37,6 @@ data TopicRule =
             , _topicRuleClasses :: [Text]
             }
   deriving stock (Show, Generic)
-  deriving (FromDhall, ToDhall) via Codec (Field (CamelCase <<< DropPrefix "_topicRule")) TopicRule
 
 makeFields ''TopicRule
 
@@ -47,7 +45,6 @@ data Search = Search { _searchName :: String
                      , _searchUrl :: String
                      }
   deriving stock (Show, Generic)
-  deriving (FromDhall, ToDhall) via Codec (Field (CamelCase <<< DropPrefix "_search")) Search
 
 makeFields ''Search
 
@@ -57,7 +54,6 @@ data ExtraConfig =
               , _extraConfigSearchEndpoints :: [Search]
               }
   deriving (Show, Generic)
-  deriving (FromDhall, ToDhall) via Codec (Field (CamelCase <<< DropPrefix "_extraConfig")) ExtraConfig
 
 makeFields ''ExtraConfig
 
