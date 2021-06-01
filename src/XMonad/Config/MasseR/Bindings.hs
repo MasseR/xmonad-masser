@@ -64,6 +64,7 @@ import XMonad.Util.NamedScratchpad
 
 import Control.Lens
        (ix, (^.), (^?))
+import XMonad.Actions.CycleWS (swapNextScreen)
 
 xpconf :: XPConfig
 xpconf = def{font="xft:Inconsolate-9"}
@@ -147,7 +148,7 @@ keybindings extraConfig conf =
                      , ("M-<minus>", addName "Decrease volume" $ spawn "amixer set Master 2-")
                      , ("<XF86AudioPlay>", addName "Play/pause music" $ spawn (application extraConfig "musicToggle"))
                      , ("M-m", spotifySubmap extraConfig conf)
-                     -- , ("M-S-<Space>", addName "Swap screens" swapNextScreen)
+                     , ("M-S-<Space>", addName "Swap screens" swapNextScreen)
                      , ("M-<Backspace>", addName "Kill window" kill)
                      -- scrot requires `unGrab`
                      , ("M-<Print>", addName "Take screenshot" $ spawn (application extraConfig "screenshot"))] ^++^
@@ -182,3 +183,4 @@ keybindings extraConfig conf =
     subKeys "Resize" []
   where
     locker = "xset s activate"
+
