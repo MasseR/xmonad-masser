@@ -1,0 +1,10 @@
+{
+  "url": "https://github.com/justinwoo/easy-dhall-nix.git",
+  "rev": "9bd1bea0dcebe1d1d120c0fd1ba76683dc4a62e3",
+  "date": "2021-07-17T15:03:24+03:00",
+  "path": "/nix/store/1kck6122as0097y9fdyhvd8vhxb5l8b3-easy-dhall-nix",
+  "sha256": "1gdx1iqhr3ih3f2v304yjnpjqydpl0x4ngrg58qa4x5wlcr5rdhl",
+  "fetchSubmodules": false,
+  "deepClone": false,
+  "leaveDotGit": false
+}

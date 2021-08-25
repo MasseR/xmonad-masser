@@ -4,15 +4,9 @@
 {-# LANGUAGE TypeApplications #-}
 module XMonad.Config.MasseR  where
 
-import Control.Exception
-       (SomeException, catch)
 
 import Control.Lens
-import Data.Text.Strict.Lens
-       (packed, unpacked)
 
-import Paths_xmonad_masser
-       (getDataFileName)
 
 import qualified Data.List as List
 import XMonad
@@ -25,23 +19,18 @@ import XMonad.Hooks.SetWMName
 import XMonad.Hooks.UrgencyHook
        (args, dzenUrgencyHook, withUrgencyHook)
 
-import XMonad.XMobar
-       (zenburnPP)
 
 import Data.Monoid
        (Endo)
 
 import System.IO
-       (hClose, hPutStr)
+       (hClose, hPutStr, stderr, hPutStrLn)
 import XMonad.Actions.Navigation2D
-import XMonad.Actions.UpdatePointer
-       (updatePointer)
 import XMonad.Util.NamedActions
 import XMonad.Util.Run
        (spawnPipe)
 
-import XMonad.Config.MasseR.Bindings
-import XMonad.Config.MasseR.ExtraConfig
+import qualified XMonad.Config.MasseR.ExtraConfig as C
 import XMonad.Config.MasseR.Layouts
 import XMonad.Config.MasseR.Theme
        (defaultTheme)
@@ -49,10 +38,16 @@ import XMonad.Layout.Decoration
        (Theme(..))
 
 
-import XMonad.Hooks.DynamicLog
-       (statusBar)
 
-import qualified Data.Set as S
+import System.Environment (setEnv)
+import qualified XMonad.Config.MasseR.ExtraConfig as ExtraConfig
+import qualified Dhall
+import System.FilePath ((</>))
+import Control.Exception (catch, SomeException)
+import XMonad.Hooks.DynamicLog (statusBar)
+import XMonad.XMobar (zenburnPP)
+import XMonad.Prompt (XPConfig(font))
+import XMonad.Config.MasseR.Bindings (keybindings)
 
 
 
@@ -76,8 +71,8 @@ q =~? x = fmap (x `List.isInfixOf`) q
 
 -- Manage hooks
 -- Move programs to their workspaces
-myManageHook :: [TopicRule] -> XMonad.Query (Endo WindowSet)
-myManageHook rules = mconcat
+myManageHook :: XMonad.Query (Endo WindowSet)
+myManageHook = mconcat
   [ webHooks
   , pdfHooks
   , documentHooks
@@ -85,13 +80,13 @@ myManageHook rules = mconcat
   , debuggerHooks
   , flowHook
   , pipHooks
-  , extraHooks
+  -- , extraHooks
   ]
   where
     classHook y = foldMap (\x -> className =? x --> y)
     titleHook y = foldMap (\x -> title =? x --> y)
-    extraHooks :: Query (Endo WindowSet)
-    extraHooks = foldMap (\r -> classHook (doShift (r ^. name . unpacked)) (r ^.. classes . traversed . unpacked)) rules
+    -- extraHooks :: Query (Endo WindowSet)
+    -- extraHooks = foldMap (\r -> classHook (doShift (r ^. name . unpacked)) (r ^.. classes . traversed . unpacked)) rules
     webHooks = classHook (doShift "web") [
           "Firefox"
         , "qutebrowser"
@@ -124,30 +119,38 @@ myManageHook rules = mconcat
     flowHook = titleHook (doShift "flowdock") ["www.flowdock.com"]
 
 
+setPath :: String -> IO ()
+setPath = setEnv "PATH"
 
-masser :: ExtraConfig -> IO ()
-masser extraConfig = xmonad =<< statusBar bar zenburnPP toggleStrutsKey myConfig
+masser :: IO ()
+masser = do
+  let xp = def{font="xft:Inconsolate-9"}
+  defaults <- ExtraConfig.defaultConfig
+  configFile <- fmap (</> "xmonad.dhall") getXMonadCacheDir
+  -- Check journactl -xe for errors
+  c <- ((defaults <>) <$> Dhall.inputFile Dhall.auto configFile) `catch` (\e -> defaults <$ hPutStrLn stderr (show @SomeException e))
+  setPath (c ^. C.path)
+  bar <- statusBar (c ^. C.applications . C.prompt) zenburnPP toggleStrutsKey (myConfig xp c)
+  xmonad bar
   where
     toggleStrutsKey XConfig{modMask=modm} = (modm, xK_b)
-    bar = application extraConfig "prompt"
-    myConfig = withUrgencyHook dzenUrgencyHook { args = ["-bg", "darkgreen", "-xs", "1"]} $
+    fullBindings xp c xc = keybindings (C.mkTopicConfig c) xp xc ^++^ C.mkBindings c xp xc
+    myConfig xp c = withUrgencyHook dzenUrgencyHook { args = ["-bg", "darkgreen", "-xs", "1"]} $
                      withNavigation2DConfig myNav2d $
                      ewmh $
-                     addDescrKeys' ((mod4Mask, xK_F1), showKeybindings) (keybindings extraConfig) $
+                     addDescrKeys' ((mod4Mask, xK_F1), showKeybindings) (fullBindings xp c) $
                      def {
                        modMask = mod4Mask -- Hyper
-                       , terminal = application extraConfig "urxvt"
+                       , terminal = c ^. C.applications . C.terminal
                        , keys = const mempty
-                       , workspaces = let defaults = ["irc", "web", "mail"]
-                                          external = extraConfig ^.. topics . folded . name . unpacked
-                                      in S.toList (S.fromList defaults <> S.fromList external)
+                       , workspaces = C.mkWorkspaces c
                        , layoutHook = layout
                        , clickJustFocuses = False
                        , startupHook = ewmhDesktopsStartup >> setWMName "LG3D"
                        , borderWidth = 2
                        , normalBorderColor = inactiveBorderColor defaultTheme
                        , focusedBorderColor = activeBorderColor defaultTheme
-                       , manageHook = myManageHook (extraConfig ^. topics)
+                       , manageHook = myManageHook
                        -- The focus follows mouse is a bad idea for me because
                        -- it misbehaves with accordion. If I accidentally hover
                        -- my mouse at the lower edge of the accordion, it will

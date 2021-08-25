@@ -3,6 +3,9 @@
 with nixpkgs;
 
 let
+  easy-dhall-nix-src = with builtins;
+    fetchgit { inherit (fromJSON (readFile ./easy-dhall-nix.json)) url rev sha256 fetchSubmodules; };
+  easy-dhall-nix = import easy-dhall-nix-src {};
   hp = haskellPackages.extend (self: super: {
     xmonad-masser = self.callPackage ./. {};
   });
@@ -26,5 +29,7 @@ hp.shellFor {
     ghcid
     cabal2nix
     easy-hls
+    easy-dhall-nix.dhall-lsp-simple
+    easy-dhall-nix.dhall-simple
   ];
 }
