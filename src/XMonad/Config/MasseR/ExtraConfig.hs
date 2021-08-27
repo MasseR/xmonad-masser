@@ -141,7 +141,7 @@ data Config = Config
   , configApplications :: Applications
   }
   deriving stock (Generic)
-  deriving (Semigroup) via (Config `Isomorphic` (Path, [Topic ], [ Fix (SubCommandF String) ], Last Applications))
+  deriving (Semigroup) via (Config `Isomorphic` (Path, Last [Topic], [ Fix (SubCommandF String) ], Last Applications))
   deriving (ToDhall, FromDhall) via (C "config" Config)
 
 makeFields ''Config
