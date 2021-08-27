@@ -1,4 +1,4 @@
 { name : Text
-, action : Optional Text
+, action : List ../Command/Type.dhall
 , home : Optional Text
 }

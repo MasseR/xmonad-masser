@@ -31,7 +31,7 @@ import Data.Text (Text)
 import GHC.Generics ( Generic (Rep), from, to )
 import Data.Coerce (Coercible, coerce)
 import XMonad.Prompt (XPConfig)
-import XMonad (XConfig, spawn, KeyMask, KeySym, def)
+import XMonad (XConfig, spawn, KeyMask, KeySym, def, X)
 import XMonad.Util.NamedActions (NamedAction, addName, subtitle, submapName)
 import XMonad.Actions.Search (promptSearchBrowser, searchEngine)
 
@@ -45,6 +45,7 @@ import Data.Semigroup (Last(Last))
 import XMonad.Actions.TopicSpace (TopicConfig(..))
 import qualified Data.Map.Strict as M
 import GHC.TypeLits (Symbol)
+import Data.Foldable (traverse_)
 
 newtype Isomorphic a b = Isomorphic a
 
@@ -77,16 +78,6 @@ data Applications = Applications
 
 makeFields ''Applications
 
-data Topic = Topic
-  { topicName :: String
-  , topicAction :: Maybe String
-  , topicHome :: Maybe FilePath
-  }
-  deriving (Generic, Show)
-  deriving (ToDhall, FromDhall) via (C "topic" Topic)
-
-makeFields ''Topic
-
 data Engine = Engine
   { engineName :: String
   , engineBrowser :: FilePath
@@ -97,12 +88,22 @@ data Engine = Engine
 
 makeFields ''Engine
 
-data Command a = Spawn a | Search Engine
+data Command = Spawn String | Search Engine
   deriving (Generic, Show)
-  deriving (ToDhall, FromDhall) via (Codec AsIs (Command a))
+  deriving (ToDhall, FromDhall) via (Codec AsIs Command)
+
+data Topic = Topic
+  { topicName :: String
+  , topicAction :: [Command]
+  , topicHome :: Maybe FilePath
+  }
+  deriving (Generic, Show)
+  deriving (ToDhall, FromDhall) via (C "topic" Topic)
+
+makeFields ''Topic
 
 data SubCommandF a k
-  = ActF { subCommandPrefixF :: String, subCommandNameF :: String, subCommandCommandF :: Command a }
+  = ActF { subCommandPrefixF :: String, subCommandNameF :: String, subCommandCommandF :: Command }
   | SubMapF { subCommandPrefixF :: String, subCommandNameF :: String, subCommandSubF :: [k] }
   deriving Functor
 
@@ -110,16 +111,19 @@ deriving instance Generic (SubCommandF a x)
 deriving via (C "subCommand" (SubCommandF a x)) instance (ToDhall a, ToDhall x) => ToDhall (SubCommandF a x)
 deriving via (C "subCommand" (SubCommandF a x)) instance (FromDhall a, FromDhall x) => FromDhall (SubCommandF a x)
 
+evalCommand :: XPConfig -> Command -> X ()
+evalCommand xp = \case
+  Spawn cmd -> spawn cmd
+  Search Engine{..} -> promptSearchBrowser xp engineBrowser (searchEngine engineName engineSite)
+
 mkCommandF
   :: XPConfig
   -> XConfig l
   -> SubCommandF String [((KeyMask, KeySym), NamedAction)]
   -> [((KeyMask, KeySym), NamedAction)]
 mkCommandF xp conf = \case
-  ActF { subCommandPrefixF = prefix, subCommandNameF = cmdName, subCommandCommandF = Spawn cmd } ->
-    mkNamedKeymap conf [(prefix, addName cmdName $ spawn cmd)]
-  ActF { subCommandPrefixF = prefix, subCommandNameF = cmdName, subCommandCommandF = Search Engine{..} } ->
-    mkNamedKeymap conf [(prefix, addName cmdName (promptSearchBrowser xp engineBrowser (searchEngine engineName engineSite)))]
+  ActF { subCommandPrefixF = prefix, subCommandNameF = cmdName, subCommandCommandF = cmd } ->
+    mkNamedKeymap conf [(prefix, addName cmdName $ evalCommand xp cmd)]
   SubMapF { subCommandPrefixF = prefix, subCommandNameF = cmdName, subCommandSubF = sub } ->
     subtitle cmdName : mkNamedKeymap conf [(prefix, submapName (concat sub))]
 
@@ -149,10 +153,10 @@ makeFields ''Config
 mkWorkspaces :: Config -> [String]
 mkWorkspaces = toListOf (topics . folded . name)
 
-mkTopicConfig :: Config -> TopicConfig
-mkTopicConfig c = def
+mkTopicConfig :: XPConfig -> Config -> TopicConfig
+mkTopicConfig xp c = def
   { topicDirs = M.fromList [(k,v) | Topic{topicName=k,topicHome=Just v} <- c ^. topics]
-  , topicActions = M.fromList [(k,spawn v) | Topic{topicName=k,topicAction=Just v} <- c ^. topics]
+  , topicActions = M.fromList [(k,traverse_ (evalCommand xp) v) | Topic{topicName=k,topicAction=v} <- c ^. topics]
   }
 
 defaultConfig :: IO Config
@@ -160,7 +164,7 @@ defaultConfig = x <$> getEnv "PATH"
   where
   x p = Config
     { configPath = p
-    , configTopics = [ Topic "web" Nothing Nothing ]
+    , configTopics = [ Topic "web" [] Nothing ]
     , configBindings = []
     , configApplications = Applications { applicationsTerminal = "urxvt", applicationsPrompt = "xmobar" }
     }
