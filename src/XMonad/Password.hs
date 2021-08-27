@@ -9,6 +9,7 @@ import           System.Posix.Env      (getEnv)
 import           XMonad.Core
 import           XMonad.Prompt
 import           XMonad.Util.Run       (runProcessWithInput)
+import Data.Char (toLower)
 
 newtype Pass = Pass { passLabel :: String }
 
@@ -37,8 +38,9 @@ mkPassPrompt label f conf = do
   -- I'm just sorting here, but could use some kind of fuzzy matching instead, but it requires a bit more effort
   passwords <- sort <$> liftIO getPasswords
   -- Other change, use infixof instead of prefixof
-  mkXPrompt (Pass label) conf (\input -> pure (sortBy (compare `on` levenshtein input) . filter (consumes input) $ passwords)) f
+  mkXPrompt (Pass label) conf (\input -> pure (sortBy (compare `on` levenshtein input) . filter (consumes (toLowerCase input) . toLowerCase) $ passwords)) f
   where
+    toLowerCase = map toLower
     consumes [] _ = True -- everything consumed
     consumes (_:_) [] = False -- all not consumed
     consumes (a:xs) (a':ys) | a == a' = consumes xs ys
