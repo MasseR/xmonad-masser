@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        channel: [20.09]
+        channel: [21.05]
     steps:
       - uses: actions/checkout@v1
       - uses: cachix/install-nix-action@v12
