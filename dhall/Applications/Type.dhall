@@ -1,0 +1,3 @@
+{ terminal : Text
+, prompt : Text
+}

@@ -1,7 +1,10 @@
 {
   "url": "https://github.com/jkachmar/easy-hls-nix",
-  "rev": "e29153112b7e4bea57c083cae5e3c12921d49456",
-  "date": "2021-03-23T23:48:21-04:00",
-  "sha256": "15wnq23181h8jr1ks97pycdxwrqymrs4i135gcb0q0mq2m4ghhhx",
-  "fetchSubmodules": false
+  "rev": "db85cac9d0405b4769b75cba0b004aed3beaf2de",
+  "date": "2021-08-16T20:36:10-04:00",
+  "path": "/nix/store/m1f38kr2dhp3wcxql1j4kp1zqvyhzlrr-easy-hls-nix",
+  "sha256": "10nff6mqflrd6dz1fp2l9vmfwbgk0r7zm81qh2xnjj19a47pd7v3",
+  "fetchSubmodules": false,
+  "deepClone": false,
+  "leaveDotGit": false
 }
