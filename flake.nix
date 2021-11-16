@@ -7,12 +7,20 @@
   };
 
   outputs = { self, nixpkgs, flake-utils, easy-hls-src }:
+  {
+    overlay = final: prev: {
+      haskellPackages = prev.haskellPackages.override ( old: {
+        overrides = final.lib.composeExtensions ( old.overrides or (_: _: {})) (f: p: {
+          xmonad-masser = f.callPackage ./. {};
+        });
+      } );
+    };
+  }
+    //
     flake-utils.lib.eachSystem ["x86_64-linux" "x86_64-darwin"] ( system:
       let
-        pkgs = nixpkgs.legacyPackages.${system};
-        hp = pkgs.haskellPackages.extend (self: super: {
-            xmonad-masser = self.callPackage ./. {};
-          });
+        pkgs = import nixpkgs { inherit system; overlays = [ self.overlay ]; };
+        hp = pkgs.haskellPackages;
         easy-hls = pkgs.callPackage easy-hls-src { ghcVersions = [ hp.ghc.version ]; };
       in
       rec {

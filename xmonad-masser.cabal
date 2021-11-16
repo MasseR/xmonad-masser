@@ -14,6 +14,13 @@ maintainer:          mats.rauhala@iki.fi
 -- category:
 build-type:          Simple
 extra-source-files:  ChangeLog.md
+data-files:          dhall/*.dhall
+                   , dhall/Applications/*.dhall
+                   , dhall/Command/*.dhall
+                   , dhall/Config/*.dhall
+                   , dhall/Engine/*.dhall
+                   , dhall/SubCommand/*.dhall
+                   , dhall/Topic/*.dhall
 
 library
   ghc-options:        -Wall
