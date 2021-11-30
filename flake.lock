@@ -1,15 +1,17 @@
 {
   "nodes": {
-    "easy-hls-src": {
+    "easy-hls": {
       "inputs": {
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": [
+          "nixpkgs"
+        ]
       },
       "locked": {
-        "lastModified": 1636606878,
-        "narHash": "sha256-rLxYl7iYP9vQhSvVlV2uRCdgrqKDz/vN1Z8ZmA8itkM=",
+        "lastModified": 1637250802,
+        "narHash": "sha256-/crlHEVB148PGQLZCsHOR9L5qgvCAfRSocIoKgmMAhA=",
         "owner": "jkachmar",
         "repo": "easy-hls-nix",
-        "rev": "edd5710946d46ea40810ef9a708b084d7e05a118",
+        "rev": "7c123399ef8a67dc0e505d9cf7f2c7f64f1cd847",
         "type": "github"
       },
       "original": {
@@ -35,21 +37,6 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1615055905,
-        "narHash": "sha256-Ig7CXgE5C3mwtTVBl8nSTessa1oMAm6Pm/p+T6iAJD8=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "f3fc074642a25ef5a1423412f09946149237e338",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
-    "nixpkgs_2": {
-      "locked": {
         "lastModified": 1637061083,
         "narHash": "sha256-n7x+jyR2l080GuYjFs5mG71QkiPbTf2MvWP/acrf7p4=",
         "owner": "NixOS",
@@ -64,9 +51,9 @@
     },
     "root": {
       "inputs": {
-        "easy-hls-src": "easy-hls-src",
+        "easy-hls": "easy-hls",
         "flake-utils": "flake-utils",
-        "nixpkgs": "nixpkgs_2"
+        "nixpkgs": "nixpkgs"
       }
     }
   },

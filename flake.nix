@@ -2,11 +2,14 @@
   description = "A very basic flake";
 
   inputs = {
-    easy-hls-src = { url = "github:jkachmar/easy-hls-nix"; };
+    easy-hls = {
+      url = "github:jkachmar/easy-hls-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     flake-utils = { url = "github:numtide/flake-utils"; };
   };
 
-  outputs = { self, nixpkgs, flake-utils, easy-hls-src }:
+  outputs = { self, nixpkgs, flake-utils, easy-hls }:
   {
     overlay = final: prev: {
       haskellPackages = prev.haskellPackages.override ( old: {
@@ -21,7 +24,7 @@
       let
         pkgs = import nixpkgs { inherit system; overlays = [ self.overlay ]; };
         hp = pkgs.haskellPackages;
-        easy-hls = pkgs.callPackage easy-hls-src { ghcVersions = [ hp.ghc.version ]; };
+        hls = easy-hls.defaultPackage.${system};
       in
       rec {
 
