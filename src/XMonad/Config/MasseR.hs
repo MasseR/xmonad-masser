@@ -73,39 +73,15 @@ q =~? x = fmap (x `List.isInfixOf`) q
 -- Move programs to their workspaces
 myManageHook :: XMonad.Query (Endo WindowSet)
 myManageHook = mconcat
-  [ webHooks
-  , pdfHooks
-  , documentHooks
-  , floatHooks
-  , debuggerHooks
+  [ floatHooks
   , flowHook
   , pipHooks
-  -- , extraHooks
   ]
   where
     classHook y = foldMap (\x -> className =? x --> y)
     titleHook y = foldMap (\x -> title =? x --> y)
     -- extraHooks :: Query (Endo WindowSet)
     -- extraHooks = foldMap (\r -> classHook (doShift (r ^. name . unpacked)) (r ^.. classes . traversed . unpacked)) rules
-    webHooks = classHook (doShift "web") [
-          "Firefox"
-        , "qutebrowser"
-        , "Midori"
-        , "chromium-browser"
-        , "Uzbl-tabbed"
-        , "Uzbl-core"
-      ]
-    pdfHooks = classHook (doShift "pdf") [
-          "Evince"
-        , "Okular"
-        , "Kpdf"
-        , "Xdvi"
-        , ".zathura-wrapped_"
-      ]
-    documentHooks = classHook (doShift "documents") [
-          "libreoffice"
-        , "libreoffice-calc"
-      ]
     floatHooks = classHook doFloat [
           "Gimp"
         , "Xmessage"
@@ -113,9 +89,6 @@ myManageHook = mconcat
       ]
     -- The new picture in picture mode in firefox
     pipHooks = titleHook doCenterFloat [ "Picture-in-Picture" ]
-    debuggerHooks = classHook (doShift "debugger") [
-          "DBeaver"
-      ]
     flowHook = titleHook (doShift "flowdock") ["www.flowdock.com"]
 
 
