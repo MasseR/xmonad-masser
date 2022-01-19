@@ -15,7 +15,7 @@ import XMonad
        , sendMessage
        , spawn
        , terminal
-       , windows, Default (def)
+       , windows, Default (def), io
        )
 import XMonad.Actions.Navigation2D
        (Direction2D(..), windowGo, windowSwap)
@@ -43,6 +43,7 @@ import XMonad.Actions.CycleWS (swapNextScreen)
 import XMonad.Actions.TopicSpace (TopicConfig)
 import XMonad.TopicUtils
 import XMonad.Actions.DynamicWorkspaces (addWorkspacePrompt, removeEmptyWorkspace)
+import System.Exit (exitSuccess)
 
 
 projectKeys :: TopicConfig -> XPConfig -> XConfig l -> [(String, NamedAction)]
@@ -61,6 +62,7 @@ systemTree = treeselectAction tsDefaultConfig
   [ Node (TSNode "Sleep" "Suspend the machine" (spawn "systemctl suspend")) []
   , Node (TSNode "Hibernate" "Hibernate the machine" (spawn "systemctl hibernate")) []
   , Node (TSNode "Shutdown" "Shutdown system" (spawn "shutdown -h now")) []
+  , Node (TSNode "Log out" "Log out of xmonad" (io exitSuccess)) []
   ]
 
 keybindings :: TopicConfig -> XPConfig -> XConfig l -> [((KeyMask, KeySym), NamedAction)]
