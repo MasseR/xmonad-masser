@@ -70,7 +70,7 @@ keybindings topics xpconf conf =
     let subKeys str ks = subtitle str : mkNamedKeymap conf ks in
     -- subKeys "Actions" [ ("M-S-r", addName "Recompile and restart" (recompile True >> spawn "xmonad --restart"))
     subKeys "Actions" [ ("M-S-r", addName "Recompile and restart" (spawn "xmonad --restart"))
-                      , ("M-C-l", addName "Lock screenx" $ spawn locker)] ^++^
+                      , ("M-C-l", addName "Lock screen" $ spawn locker)] ^++^
     subKeys "System" [ ("<XF86Sleep>", addName "Suspend machine" $ spawn "sudo pm-suspend")
                      , ("<XF86AudioRaiseVolume>", addName "Increase volume" $ spawn "amixer set Master 2%+")
                      , ("<XF86AudioLowerVolume>", addName "Decrease volume" $ spawn "amixer set Master 2%-")
