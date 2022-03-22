@@ -2,14 +2,10 @@
   description = "A very basic flake";
 
   inputs = {
-    easy-hls = {
-      url = "github:jkachmar/easy-hls-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     flake-utils = { url = "github:numtide/flake-utils"; };
   };
 
-  outputs = { self, nixpkgs, flake-utils, easy-hls }:
+  outputs = { self, nixpkgs, flake-utils }:
   {
     overlay = final: prev: {
       haskellPackages = prev.haskellPackages.override ( old: {
@@ -24,7 +20,6 @@
       let
         pkgs = import nixpkgs { inherit system; overlays = [ self.overlay ]; };
         hp = pkgs.haskellPackages;
-        hls = easy-hls.defaultPackage.${system};
       in
       rec {
 
@@ -40,7 +35,7 @@
             hp.hlint
             stylish-haskell
             ghcid
-            hls
+            hp.haskell-language-server
 
             sqlite-interactive
 
