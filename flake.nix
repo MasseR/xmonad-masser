@@ -12,7 +12,7 @@
         overrides = final.lib.composeExtensions ( old.overrides or (_: _: {})) (f: p: {
           xmonad-masser = f.callPackage ./. {};
         });
-      } );
+      });
     };
   }
     //
