@@ -11,7 +11,7 @@ import Control.Lens
 import qualified Data.List as List
 import XMonad
 import XMonad.Hooks.EwmhDesktops
-       (ewmh, ewmhDesktopsStartup)
+       (ewmh)
 import XMonad.Hooks.ManageHelpers
        (doCenterFloat)
 import XMonad.Hooks.SetWMName
@@ -39,7 +39,7 @@ import XMonad.Layout.Decoration
 
 
 
-import System.Environment (setEnv)
+import System.Environment (setEnv, getEnv)
 import qualified XMonad.Config.MasseR.ExtraConfig as ExtraConfig
 import qualified Dhall
 import System.FilePath ((</>))
@@ -99,7 +99,7 @@ masser :: IO ()
 masser = do
   let xp = def{font="xft:Inconsolate-9"}
   defaults <- ExtraConfig.defaultConfig
-  configFile <- fmap (</> "xmonad.dhall") getXMonadCacheDir
+  configFile <- fmap (</> ".xmonad/xmonad.dhall") $ getEnv "HOME"
   -- Check journactl -xe for errors
   c <- ((defaults <>) <$> Dhall.inputFile Dhall.auto configFile) `catch` (\e -> defaults <$ hPutStrLn stderr (show @SomeException e))
   setPath (c ^. C.path)
@@ -119,7 +119,7 @@ masser = do
                        , workspaces = C.mkWorkspaces c
                        , layoutHook = layout
                        , clickJustFocuses = False
-                       , startupHook = ewmhDesktopsStartup >> setWMName "LG3D"
+                       , startupHook = setWMName "LG3D"
                        , borderWidth = 2
                        , normalBorderColor = inactiveBorderColor defaultTheme
                        , focusedBorderColor = activeBorderColor defaultTheme

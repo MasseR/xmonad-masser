@@ -2,6 +2,7 @@
   description = "A very basic flake";
 
   inputs = {
+    nixpkgs = { url = "github:NixOS/nixpkgs/nixos-unstable"; };
     flake-utils = { url = "github:numtide/flake-utils"; };
   };
 
@@ -12,7 +13,7 @@
         overrides = final.lib.composeExtensions ( old.overrides or (_: _: {})) (f: p: {
           xmonad-masser = f.callPackage ./. {};
         });
-      });
+      } );
     };
   }
     //
