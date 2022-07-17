@@ -101,7 +101,8 @@ masser = do
   defaults <- ExtraConfig.defaultConfig
   configFile <- fmap (</> ".xmonad/xmonad.dhall") $ getEnv "HOME"
   -- Check journactl -xe for errors
-  c <- ((defaults <>) <$> Dhall.inputFile Dhall.auto configFile) `catch` (\e -> defaults <$ hPutStrLn stderr (show @SomeException e))
+  c <- ((defaults <>) <$>
+        Dhall.inputFile Dhall.auto configFile) `catch` (\e -> defaults <$ hPutStrLn stderr (show @SomeException e))
   setPath (c ^. C.path)
   bar <- statusBar (c ^. C.applications . C.prompt) zenburnPP toggleStrutsKey (myConfig xp c)
   xmonad bar
