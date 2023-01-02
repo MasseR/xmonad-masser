@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase #-}
 module XMonad.XMobar (zenburnPP) where
 
 -- import XMonad.Util.Loggers
@@ -25,7 +26,9 @@ zenburnPP = xmobarPP {
     , ppSep = " | "
     , ppLayout = id
     , ppUrgent = xmobarColor myUrgencyHintFgColor myUrgencyHintBgColor . dzenStrip
-    , ppOrder = \(ws:_layout:_title:_) -> [ws]
+    , ppOrder = \case
+      (ws:_layout:_title:_) -> [ws]
+      _ -> []
     , ppExtras = []
   }
 

@@ -20,7 +20,7 @@ import XMonad
 import XMonad.Actions.Navigation2D
        (Direction2D(..), windowGo, windowSwap)
 import XMonad.Actions.TreeSelect
-       (TSNode(..), treeselectAction, tsDefaultConfig)
+       (TSNode(..), treeselectAction)
 import XMonad.Layout
        (ChangeLayout(..))
 import XMonad.Layout.ToggleLayouts
@@ -58,7 +58,7 @@ projectKeys topics xpconf conf = [ ("M-y", addName "Change topic" $ visualSelect
                                       , ("d", addName "Remove empty workspace" removeEmptyWorkspace)]
 
 systemTree :: X ()
-systemTree = treeselectAction tsDefaultConfig
+systemTree = treeselectAction def
   [ Node (TSNode "Sleep" "Suspend the machine" (spawn "systemctl suspend")) []
   , Node (TSNode "Hibernate" "Hibernate the machine" (spawn "systemctl hibernate")) []
   , Node (TSNode "Shutdown" "Shutdown system" (spawn "shutdown -h now")) []

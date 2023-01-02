@@ -29,7 +29,7 @@
         defaultPackage = packages.xmonad-masser;
         devShell = hp.shellFor {
           packages = h: [h.xmonad-masser];
-          withHoogle = true;
+          withHoogle = false;
           buildInputs = with pkgs; [
             entr
             cabal-install
@@ -39,8 +39,6 @@
             hp.haskell-language-server
 
             sqlite-interactive
-
-            hp.graphmod
           ];
         };
       }
