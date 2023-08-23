@@ -37,7 +37,7 @@ library
                     , XMonad.Actions.OrgTodo
   default-extensions:  OverloadedStrings
   -- other-extensions:
-  build-depends:       base >=4.11 && <4.17
+  build-depends:       base >=4.11 && <4.18
                      , xmonad
                      , xmonad-contrib
                      , mtl
