@@ -108,7 +108,7 @@ masser = do
   xmonad bar
   where
     toggleStrutsKey XConfig{modMask=modm} = (modm, xK_b)
-    fullBindings xp c xc = keybindings (C.mkTopicConfig xp c) xp xc ^++^ C.mkBindings c xp xc
+    fullBindings xp c xc = keybindings (C.mkMenu c xp) (C.mkTopicConfig xp c) xp xc ^++^ C.mkBindings c xp xc
     myConfig xp c = withUrgencyHook dzenUrgencyHook { args = ["-bg", "darkgreen", "-xs", "1"]} $
                      withNavigation2DConfig myNav2d $
                      ewmh $

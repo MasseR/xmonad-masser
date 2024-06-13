@@ -57,7 +57,9 @@ projectKeys topics xpconf conf = [ ("M-y", addName "Change topic" $ visualSelect
                                       , ("w", addName "Copy project" copyTopic)
                                       , ("d", addName "Remove empty workspace" removeEmptyWorkspace)]
 
-systemMenu :: Forest (TSNode (X ()))
+type Menu = Forest (TSNode (X ()))
+
+systemMenu :: Menu
 systemMenu =
   [ Node (TSNode "Sleep" "Suspend the machine" (spawn "systemctl suspend")) []
   , Node (TSNode "Hibernate" "Hibernate the machine" (spawn "systemctl hibernate")) []
@@ -65,8 +67,8 @@ systemMenu =
   , Node (TSNode "Log out" "Log out of xmonad" (io exitSuccess)) []
   ]
 
-keybindings :: TopicConfig -> XPConfig -> XConfig l -> [((KeyMask, KeySym), NamedAction)]
-keybindings topics xpconf conf =
+keybindings :: Menu -> TopicConfig -> XPConfig -> XConfig l -> [((KeyMask, KeySym), NamedAction)]
+keybindings menu topics xpconf conf =
     let subKeys str ks = subtitle str : mkNamedKeymap conf ks in
     -- subKeys "Actions" [ ("M-S-r", addName "Recompile and restart" (recompile True >> spawn "xmonad --restart"))
     subKeys "Actions" [ ("M-S-r", addName "Recompile and restart" (spawn "xmonad --restart"))
@@ -74,7 +76,7 @@ keybindings topics xpconf conf =
     subKeys "System" [ ("<XF86Sleep>", addName "Suspend machine" $ spawn "sudo pm-suspend")
                      , ("<XF86AudioRaiseVolume>", addName "Increase volume" $ spawn "amixer set Master 2%+")
                      , ("<XF86AudioLowerVolume>", addName "Decrease volume" $ spawn "amixer set Master 2%-")
-                     , ("<XF86Favorites>", addName "Menu" $ treeselectAction def systemMenu)
+                     , ("<XF86Favorites>", addName "Menu" $ treeselectAction def (systemMenu <> menu))
                      , ("M-S-<Space>", addName "Swap screens" swapNextScreen)
                      , ("M-<Backspace>", addName "Kill window" kill)
                      ]

@@ -17,6 +17,7 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE DeriveTraversable #-}
 {-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE NamedFieldPuns #-}
 module XMonad.Config.MasseR.ExtraConfig where
 
 import qualified Data.Fix as Fix
@@ -45,6 +46,8 @@ import XMonad.Actions.TopicSpace (TopicConfig(..))
 import qualified Data.Map.Strict as M
 import GHC.TypeLits (Symbol)
 import Data.Foldable (traverse_)
+import Data.Tree (Tree (..), Forest)
+import XMonad.Actions.TreeSelect (TSNode(..))
 
 newtype Isomorphic a b = Isomorphic a
 
@@ -136,14 +139,22 @@ mkCommandF xp conf = \case
     subtitle cmdName : mkNamedKeymap conf [(prefix, submapName (concat sub))]
 
 fold :: Functor f => (f a -> a) -> Fix.Fix f -> a
-fold f = c where c = f . fmap c . Fix.unFix
+fold = Fix.foldFix
 {-# INLINE fold #-}
+
+mkTreeF :: XPConfig -> TreeF (Tree (TSNode (X ()))) -> Tree (TSNode (X ()))
+mkTreeF xp = \case
+  NodeF { treeNameF, treeExtraF, treeValueF, treeChildrenF } ->
+    Node (TSNode treeNameF treeExtraF (maybe (pure ()) (evalCommand xp) treeValueF)) treeChildrenF
 
 mkCommand :: XPConfig -> XConfig l -> Fix.Fix (SubCommandF String) -> [((KeyMask, KeySym), NamedAction)]
 mkCommand xp conf = fold (mkCommandF xp conf)
 
 mkBindings :: Config -> XPConfig -> XConfig l -> [((KeyMask, KeySym), NamedAction)]
 mkBindings c xp xc = concatMap (mkCommand xp xc) (configBindings c)
+
+mkMenu :: Config -> XPConfig -> Forest (TSNode (X ()))
+mkMenu c xp = map (fold (mkTreeF xp)) (configMenu c)
 
 
 data Config = Config
