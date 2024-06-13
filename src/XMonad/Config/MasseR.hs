@@ -99,7 +99,7 @@ masser :: IO ()
 masser = do
   let xp = def{font="xft:Inconsolate-9"}
   defaults <- ExtraConfig.defaultConfig
-  configFile <- fmap (</> ".xmonad/xmonad.dhall") $ getEnv "HOME"
+  configFile <- (</> ".xmonad/xmonad.dhall") <$> getEnv "HOME"
   -- Check journactl -xe for errors
   c <- ((defaults <>) <$>
         Dhall.inputFile Dhall.auto configFile) `catch` (\e -> defaults <$ hPutStrLn stderr (show @SomeException e))
