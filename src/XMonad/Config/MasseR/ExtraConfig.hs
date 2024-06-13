@@ -112,7 +112,7 @@ deriving via (C "subCommand" (SubCommandF a x)) instance (FromDhall a, FromDhall
 
 
 data TreeF k
-  = NodeF { treeNameF :: String, treeExtraF :: String, treeValueF :: Command, treeChildrenF :: [k] }
+  = NodeF { treeNameF :: String, treeExtraF :: String, treeValueF :: Maybe Command, treeChildrenF :: [k] }
   deriving (Functor, Eq, Show)
 deriving instance Generic (TreeF k)
 deriving via (C "tree" (TreeF k)) instance (ToDhall k) => ToDhall (TreeF k)

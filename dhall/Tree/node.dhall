@@ -9,10 +9,10 @@ let Make = ./Make.dhall
 let Tree = ./Type.dhall
 
 let Node
-    : { name : Text, extra : Text, value : Command, children : List Tree } →
+    : { name : Text, extra : Text, value : Optional Command, children : List Tree } →
         Tree
     = λ ( node
-        : { name : Text, extra : Text, value : Command, children : List Tree }
+        : { name : Text, extra : Text, value : Optional Command, children : List Tree }
         ) →
       λ(result : Type) →
       λ(make : Make result → result) →

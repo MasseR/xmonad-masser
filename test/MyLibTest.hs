@@ -33,5 +33,9 @@ spec = describe "Reading the dhall configuration" $ do
   it "Reads some menus" $ do
     c <- readDhallConfig "test/data/menu.dhall"
     let menu = configMenu c
-    map (fold foldTree) menu `shouldBe` [["terminal", "", "Spawn \"asd\""]]
+    map (fold foldTree) menu `shouldBe` [["terminal", "", "Just (Spawn \"asd\")"]]
+  it "Reads a recursive menus" $ do
+    c <- readDhallConfig "test/data/recursive_menu.dhall"
+    let menu = configMenu c
+    map (fold foldTree) menu `shouldBe` [["music","","Nothing","Play previous","","Just (Spawn \"sp prev\")","Play next","","Just (Spawn \"sp next\")"]]
 

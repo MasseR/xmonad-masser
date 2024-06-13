@@ -6,7 +6,7 @@ in  Config::{
           [ Config.Tree.node
               { name = "terminal"
               , extra = ""
-              , value = Config.Command.Spawn "asd"
+              , value = Some (Config.Command.Spawn "asd")
               , children = [] : List Config.Tree.Type
               }
           ]
