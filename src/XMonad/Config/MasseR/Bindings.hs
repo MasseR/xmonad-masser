@@ -4,7 +4,7 @@ module XMonad.Config.MasseR.Bindings (keybindings) where
 
 
 import Data.Tree
-       (Tree(Node))
+       (Tree(Node), Forest)
 
 import XMonad
        ( KeyMask
@@ -57,8 +57,8 @@ projectKeys topics xpconf conf = [ ("M-y", addName "Change topic" $ visualSelect
                                       , ("w", addName "Copy project" copyTopic)
                                       , ("d", addName "Remove empty workspace" removeEmptyWorkspace)]
 
-systemTree :: X ()
-systemTree = treeselectAction def
+systemMenu :: Forest (TSNode (X ()))
+systemMenu =
   [ Node (TSNode "Sleep" "Suspend the machine" (spawn "systemctl suspend")) []
   , Node (TSNode "Hibernate" "Hibernate the machine" (spawn "systemctl hibernate")) []
   , Node (TSNode "Shutdown" "Shutdown system" (spawn "shutdown -h now")) []
@@ -74,7 +74,7 @@ keybindings topics xpconf conf =
     subKeys "System" [ ("<XF86Sleep>", addName "Suspend machine" $ spawn "sudo pm-suspend")
                      , ("<XF86AudioRaiseVolume>", addName "Increase volume" $ spawn "amixer set Master 2%+")
                      , ("<XF86AudioLowerVolume>", addName "Decrease volume" $ spawn "amixer set Master 2%-")
-                     , ("<XF86Favorites>", addName "System commands" systemTree)
+                     , ("<XF86Favorites>", addName "Menu" $ treeselectAction def systemMenu)
                      , ("M-S-<Space>", addName "Swap screens" swapNextScreen)
                      , ("M-<Backspace>", addName "Kill window" kill)
                      ]
