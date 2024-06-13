@@ -3,4 +3,5 @@
 , SubCommand = ./SubCommand/package.dhall
 , Command = ./Command/Type.dhall
 , Topic = ./Topic/package.dhall
+, Tree = ./Tree/package.dhall
 }

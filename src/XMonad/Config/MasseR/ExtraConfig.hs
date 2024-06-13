@@ -82,13 +82,13 @@ data Engine = Engine
   , engineBrowser :: FilePath
   , engineSite :: String
   }
-  deriving (Generic, Show)
+  deriving (Generic, Show, Eq)
   deriving (ToDhall, FromDhall) via (C "engine" Engine)
 
 makeFields ''Engine
 
 data Command = Spawn String | Search Engine
-  deriving (Generic, Show)
+  deriving (Generic, Show, Eq)
   deriving (ToDhall, FromDhall) via (Codec AsIs Command)
 
 data Topic = Topic
@@ -104,11 +104,20 @@ makeFields ''Topic
 data SubCommandF a k
   = ActF { subCommandPrefixF :: String, subCommandNameF :: String, subCommandCommandF :: Command }
   | SubMapF { subCommandPrefixF :: String, subCommandNameF :: String, subCommandSubF :: [k] }
-  deriving Functor
+  deriving (Functor, Eq, Show)
 
 deriving instance Generic (SubCommandF a x)
 deriving via (C "subCommand" (SubCommandF a x)) instance (ToDhall a, ToDhall x) => ToDhall (SubCommandF a x)
 deriving via (C "subCommand" (SubCommandF a x)) instance (FromDhall a, FromDhall x) => FromDhall (SubCommandF a x)
+
+
+data TreeF k
+  = NodeF { treeNameF :: String, treeExtraF :: String, treeValueF :: Command, treeChildrenF :: [k] }
+  deriving (Functor, Eq, Show)
+deriving instance Generic (TreeF k)
+deriving via (C "tree" (TreeF k)) instance (ToDhall k) => ToDhall (TreeF k)
+deriving via (C "tree" (TreeF k)) instance (FromDhall k) => FromDhall (TreeF k)
+
 
 evalCommand :: XPConfig -> Command -> X ()
 evalCommand xp = \case
@@ -141,10 +150,19 @@ data Config = Config
   { configPath :: String -- ^ the path containing the binaries
   , configTopics :: [Topic]
   , configBindings :: [Fix (SubCommandF String)]
+  , configMenu :: [Fix TreeF]
   , configApplications :: Applications
   }
   deriving stock (Generic)
-  deriving (Semigroup) via (Config `Isomorphic` (Path, Last [Topic], [ Fix (SubCommandF String) ], Last Applications))
+  deriving (Semigroup) via
+    ( Config `Isomorphic`
+      ( Path
+      , Last [Topic]
+      , [ Fix (SubCommandF String) ]
+      , [ Fix TreeF ]
+      , Last Applications
+      )
+    )
   deriving (ToDhall, FromDhall) via (C "config" Config)
 
 makeFields ''Config
@@ -165,6 +183,7 @@ defaultConfig = x <$> getEnv "PATH"
     { configPath = p
     , configTopics = [ Topic "web" [] Nothing ]
     , configBindings = []
+    , configMenu = []
     , configApplications = Applications { applicationsTerminal = "urxvt", applicationsPrompt = "xmobar" }
     }
 
