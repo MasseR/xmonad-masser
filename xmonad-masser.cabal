@@ -21,6 +21,7 @@ data-files:          dhall/*.dhall
                    , dhall/Engine/*.dhall
                    , dhall/SubCommand/*.dhall
                    , dhall/Topic/*.dhall
+                   , dhall/Tree/*.dhall
 
 library
   ghc-options:        -Wall
