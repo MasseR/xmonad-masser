@@ -9,7 +9,6 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE StrictData #-}
-{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
@@ -18,6 +17,7 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE DeriveTraversable #-}
 {-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE NamedFieldPuns #-}
 module XMonad.Config.MasseR.ExtraConfig where
 
 import qualified Data.Fix as Fix
@@ -46,6 +46,8 @@ import XMonad.Actions.TopicSpace (TopicConfig(..))
 import qualified Data.Map.Strict as M
 import GHC.TypeLits (Symbol)
 import Data.Foldable (traverse_)
+import Data.Tree (Tree (..), Forest)
+import XMonad.Actions.TreeSelect (TSNode(..))
 
 newtype Isomorphic a b = Isomorphic a
 
@@ -83,13 +85,13 @@ data Engine = Engine
   , engineBrowser :: FilePath
   , engineSite :: String
   }
-  deriving (Generic, Show)
+  deriving (Generic, Show, Eq)
   deriving (ToDhall, FromDhall) via (C "engine" Engine)
 
 makeFields ''Engine
 
 data Command = Spawn String | Search Engine
-  deriving (Generic, Show)
+  deriving (Generic, Show, Eq)
   deriving (ToDhall, FromDhall) via (Codec AsIs Command)
 
 data Topic = Topic
@@ -105,11 +107,20 @@ makeFields ''Topic
 data SubCommandF a k
   = ActF { subCommandPrefixF :: String, subCommandNameF :: String, subCommandCommandF :: Command }
   | SubMapF { subCommandPrefixF :: String, subCommandNameF :: String, subCommandSubF :: [k] }
-  deriving Functor
+  deriving (Functor, Eq, Show)
 
 deriving instance Generic (SubCommandF a x)
 deriving via (C "subCommand" (SubCommandF a x)) instance (ToDhall a, ToDhall x) => ToDhall (SubCommandF a x)
 deriving via (C "subCommand" (SubCommandF a x)) instance (FromDhall a, FromDhall x) => FromDhall (SubCommandF a x)
+
+
+data TreeF k
+  = NodeF { treeNameF :: String, treeExtraF :: String, treeValueF :: Maybe Command, treeChildrenF :: [k] }
+  deriving (Functor, Eq, Show)
+deriving instance Generic (TreeF k)
+deriving via (C "tree" (TreeF k)) instance (ToDhall k) => ToDhall (TreeF k)
+deriving via (C "tree" (TreeF k)) instance (FromDhall k) => FromDhall (TreeF k)
+
 
 evalCommand :: XPConfig -> Command -> X ()
 evalCommand xp = \case
@@ -128,8 +139,13 @@ mkCommandF xp conf = \case
     subtitle cmdName : mkNamedKeymap conf [(prefix, submapName (concat sub))]
 
 fold :: Functor f => (f a -> a) -> Fix.Fix f -> a
-fold f = c where c = f . fmap c . Fix.unFix
+fold = Fix.foldFix
 {-# INLINE fold #-}
+
+mkTreeF :: XPConfig -> TreeF (Tree (TSNode (X ()))) -> Tree (TSNode (X ()))
+mkTreeF xp = \case
+  NodeF { treeNameF, treeExtraF, treeValueF, treeChildrenF } ->
+    Node (TSNode treeNameF treeExtraF (maybe (pure ()) (evalCommand xp) treeValueF)) treeChildrenF
 
 mkCommand :: XPConfig -> XConfig l -> Fix.Fix (SubCommandF String) -> [((KeyMask, KeySym), NamedAction)]
 mkCommand xp conf = fold (mkCommandF xp conf)
@@ -137,15 +153,27 @@ mkCommand xp conf = fold (mkCommandF xp conf)
 mkBindings :: Config -> XPConfig -> XConfig l -> [((KeyMask, KeySym), NamedAction)]
 mkBindings c xp xc = concatMap (mkCommand xp xc) (configBindings c)
 
+mkMenu :: Config -> XPConfig -> Forest (TSNode (X ()))
+mkMenu c xp = map (fold (mkTreeF xp)) (configMenu c)
+
 
 data Config = Config
   { configPath :: String -- ^ the path containing the binaries
   , configTopics :: [Topic]
   , configBindings :: [Fix (SubCommandF String)]
+  , configMenu :: [Fix TreeF]
   , configApplications :: Applications
   }
   deriving stock (Generic)
-  deriving (Semigroup) via (Config `Isomorphic` (Path, Last [Topic], [ Fix (SubCommandF String) ], Last Applications))
+  deriving (Semigroup) via
+    ( Config `Isomorphic`
+      ( Path
+      , Last [Topic]
+      , [ Fix (SubCommandF String) ]
+      , [ Fix TreeF ]
+      , Last Applications
+      )
+    )
   deriving (ToDhall, FromDhall) via (C "config" Config)
 
 makeFields ''Config
@@ -166,6 +194,7 @@ defaultConfig = x <$> getEnv "PATH"
     { configPath = p
     , configTopics = [ Topic "web" [] Nothing ]
     , configBindings = []
+    , configMenu = []
     , configApplications = Applications { applicationsTerminal = "urxvt", applicationsPrompt = "xmobar" }
     }
 
