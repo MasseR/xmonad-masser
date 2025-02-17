@@ -103,8 +103,15 @@ keybindings menu topics xpconf conf =
                       , ("M-S-k", addName "Shift window up" $ windowSwap U False)
                       , ("M-S-h", addName "Shift window left" $ windowSwap L False)
                       , ("M-S-l", addName "Shift window right" $ windowSwap R False)
-                      , ("M-.", addName "Sink floating to tiling" $ withFocused (windows . W.sink))
-                      , ("M-,", addName "Float a window" $ withFocused (\w -> windows (W.float w (W.RationalRect (1/4) (1/4) (1/2) (1/2)))))
+                      -- These two keybindings might look redundant with the hjkl keybindings above,
+                      -- but the directional bindings don't work in a tabbed layout. In the tabbed
+                      -- layout, these are absolutely critical
+                      , ("M-.", addName "Go to previous window" $ windows W.focusDown)
+                      , ("M-,", addName "Go to next window" $ windows W.focusUp)
+                      -- Keybindings for floating and unfloating
+                      , ("M-S-.", addName "Sink floating to tiling" $ withFocused (windows . W.sink))
+                      , ("M-S-,", addName "Float a window" $ withFocused (\w -> windows (W.float w (W.RationalRect (1/4) (1/4) (1/2) (1/2)))))
+                      -- swap master
                       , ("M-S-m", addName "Swap master" $ windows W.swapMaster)
                       ] ^++^
     subKeys "Projects & Workspaces" (projectKeys topics xpconf conf) ^++^
