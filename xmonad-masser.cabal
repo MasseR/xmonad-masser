@@ -21,6 +21,7 @@ data-files:          dhall/*.dhall
                    , dhall/Engine/*.dhall
                    , dhall/SubCommand/*.dhall
                    , dhall/Topic/*.dhall
+                   , dhall/Tree/*.dhall
 
 library
   ghc-options:        -Wall
@@ -54,3 +55,13 @@ library
                      , data-fix
   hs-source-dirs:      src
   default-language:    Haskell2010
+
+test-suite xmonad-masser-test
+    default-language: Haskell2010
+    type:             exitcode-stdio-1.0
+    hs-source-dirs:   test
+    main-is:          MyLibTest.hs
+    build-depends:    base >=4.11 && <4.19
+                    , xmonad-masser
+                    , hspec
+                    , dhall

@@ -16,7 +16,7 @@
       });
       haskellPackages = prev.haskellPackages.override ( old: {
         overrides = final.lib.composeExtensions ( old.overrides or (_: _: {})) (f: p: {
-          xmonad-masser = f.callPackage ./. {};
+          xmonad-masser = prev.haskell.lib.dontCheck (f.callPackage ./. {});
         });
       } );
     };
