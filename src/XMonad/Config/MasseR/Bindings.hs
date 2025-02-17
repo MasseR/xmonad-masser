@@ -15,7 +15,7 @@ import XMonad
        , sendMessage
        , spawn
        , terminal
-       , windows, Default (def), io
+       , windows, Default (def), io, withFocused
        )
 import XMonad.Actions.Navigation2D
        (Direction2D(..), windowGo, windowSwap)
@@ -103,8 +103,8 @@ keybindings menu topics xpconf conf =
                       , ("M-S-k", addName "Shift window up" $ windowSwap U False)
                       , ("M-S-h", addName "Shift window left" $ windowSwap L False)
                       , ("M-S-l", addName "Shift window right" $ windowSwap R False)
-                      , ("M-.", addName "Go to previous window" $ windows W.focusDown)
-                      , ("M-,", addName "Go to next window" $ windows W.focusUp)
+                      , ("M-.", addName "Sink floating to tiling" $ withFocused (windows . W.sink))
+                      , ("M-,", addName "Float a window" $ withFocused (\w -> windows (W.float w (W.RationalRect (1/4) (1/4) (1/2) (1/2)))))
                       , ("M-S-m", addName "Swap master" $ windows W.swapMaster)
                       ] ^++^
     subKeys "Projects & Workspaces" (projectKeys topics xpconf conf) ^++^
