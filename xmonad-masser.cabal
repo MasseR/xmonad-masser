@@ -38,7 +38,7 @@ library
                     , XMonad.Actions.OrgTodo
   default-extensions:  OverloadedStrings
   -- other-extensions:
-  build-depends:       base >=4.11 && <4.19
+  build-depends:       base >=4.11 && <4.20
                      , xmonad
                      , xmonad-contrib
                      , mtl
@@ -61,7 +61,7 @@ test-suite xmonad-masser-test
     type:             exitcode-stdio-1.0
     hs-source-dirs:   test
     main-is:          MyLibTest.hs
-    build-depends:    base >=4.11 && <4.19
+    build-depends:    base >=4.11 && <4.20
                     , xmonad-masser
                     , hspec
                     , dhall
